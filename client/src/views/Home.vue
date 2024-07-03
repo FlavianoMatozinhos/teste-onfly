@@ -1,7 +1,10 @@
 <template>
   <div class="home">
     <h2>Home</h2>
-    <button @click="goToUsers">Gerenciar Usuários</button>
+    <div>
+      <button @click="goToUsers">Gerenciar Usuários</button>
+      <button @click="goToCreateExpense">Cadastrar Despesa</button>
+    </div>
     <div v-if="expenses.length">
       <h3>Suas Despesas</h3>
       <table>
@@ -44,12 +47,20 @@ export default {
     goToUsers() {
       this.$router.push('/users');
     },
+    goToCreateExpense() {
+      this.$router.push('/expenses/create');
+    },
     async loadExpenses() {
       try {
         const response = await this.$http.get('/expenses');
-        this.expenses = response.data.data;
+        if (response.data && response.data.data) {
+          this.expenses = response.data.data;
+        } else {
+          this.errorMessage = 'Dados de despesas vazios ou não encontrados.';
+          this.expenses = [];
+        }
       } catch (error) {
-        console.error('Erro ao carregar despesas:', error);
+        this.expenses = []; 
         this.error = true;
         this.errorMessage = 'Erro ao carregar despesas. Por favor, tente novamente mais tarde.';
       }
