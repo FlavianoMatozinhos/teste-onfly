@@ -29,15 +29,19 @@ export default new Vuex.Store({
     },
     actions: {
         async login({ commit }, form) {
-            const response = await axios.post('/login', {
-                email: form.email,
-                password: form.password
-            });
-            const token = response.data.token;
-            commit('setToken', token);
-            localStorage.setItem('token', token);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            return response;
+            try {
+                const response = await axios.post('/login', {
+                    email: form.email,
+                    password: form.password
+                });
+                const token = response.data.data.token;
+                commit('setToken', token);
+                localStorage.setItem('token', token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                return response;
+            } catch (error) {
+                throw new Error('Erro durante o login: ' + error.message);
+            }
         },
         logout({ commit }) {
             commit('removeToken');
