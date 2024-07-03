@@ -57,7 +57,6 @@ export default {
           this.expenses = response.data.data;
         } else {
           this.errorMessage = 'Dados de despesas vazios ou não encontrados.';
-          console.warn('Dados de despesas vazios ou não encontrados.');
           this.expenses = [];
         }
       } catch (error) {
