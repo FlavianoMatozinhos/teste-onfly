@@ -3,7 +3,8 @@ import Router from 'vue-router';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
-import store from '../store'; // Importa o store do Vuex
+import Users from '../views/Users.vue';
+import store from '../store';
 
 Vue.use(Router);
 
@@ -25,6 +26,11 @@ const router = new Router({
             path: '/register',
             name: 'Register',
             component: Register,
+        },
+        {
+            path: '/users',
+            name: 'Users',
+            component: Users,
         },
     ],
 });

@@ -23,9 +23,9 @@ export default {
     async login() {
       try {
         await this.$store.dispatch('login', this.formData);
-        this.$router.push({ path: '/' });
+        this.$router.push('/');
       } catch (error) {
-        console.error("Erro ao fazer login:", error);
+        console.error('Erro durante o login:', error);
       }
     }
   }

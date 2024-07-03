@@ -38,13 +38,15 @@ class LoginRegisterController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        $data['token'] = $user->createToken('token')->accessToken;
+        $token = $user->createToken('token')->accessToken;
+
         $data['user'] = $user;
 
         $response = [
             'status' => 'success',
             'message' => 'User is created successfully.',
             'data' => $data,
+            'token' => $token
         ];
 
         return response()->json($response, 201);
