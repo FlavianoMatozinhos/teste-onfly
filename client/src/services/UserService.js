@@ -20,7 +20,7 @@ export default {
 
     // Atualiza um usuário existente por ID
     updateUser(id, userData) {
-        return axios.put(`${API_URL}/${id}`, userData);
+        return axios.post(`${API_URL}/${id}`, userData);
     },
 
     // Exclui um usuário por ID

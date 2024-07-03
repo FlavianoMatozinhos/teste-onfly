@@ -38,18 +38,18 @@
   export default {
     data() {
       return {
-        users: [], // Lista de usuários
-        formData: { name: '', email: '', password: '' }, // Dados do formulário
-        editingUser: null // Usuário em edição (se houver)
+        users: [],
+        formData: { name: '', email: '', password: '' },
+        editingUser: null
       };
     },
     created() {
-      this.loadUsers(); // Carrega usuários ao entrar na página
+      this.loadUsers();
     },
     methods: {
       async loadUsers() {
         try {
-          const response = await this.$http.get('/users'); // Altere para o endpoint correto
+          const response = await this.$http.get('/users');
           this.users = response.data;
         } catch (error) {
           console.error('Erro ao carregar usuários:', error);
@@ -57,42 +57,45 @@
       },
       async createUser() {
         try {
-          const response = await this.$http.post('/users', this.formData); // Endpoint correto conforme definido no Laravel
-          this.users.push(response.data); // Adiciona novo usuário à lista local
-          this.resetForm(); // Limpa o formulário após criação
+          const response = await this.$http.post('/users', this.formData);
+          this.users.push(response.data);
+          this.resetForm();
         } catch (error) {
           console.error('Erro ao criar usuário:', error);
         }
       },
       async updateUser() {
         try {
-          await this.$http.put(`/users/${this.editingUser.id}`, this.formData); // Endpoint correto conforme definido no Laravel
+          await this.$http.post(`/users/${this.editingUser.id}`, this.formData);
           const index = this.users.findIndex(user => user.id === this.editingUser.id);
           if (index !== -1) {
             this.users.splice(index, 1, { ...this.formData, id: this.editingUser.id });
           }
-          this.resetForm(); // Limpa o formulário após atualização
+          this.resetForm();
         } catch (error) {
-          console.error('Erro ao atualizar usuário:', error);
+          if (error.response.status === 422 && error.response.data.errors && error.response.data.errors.email) {
+            console.error('Erro ao atualizar usuário:', error.response.data.errors.email[0]);
+            // Exemplo: Mostrar uma mensagem de erro ao usuário
+            alert('Erro ao atualizar usuário: ' + error.response.data.errors.email[0]);
+          } else {
+            console.error('Erro ao atualizar usuário:', error);
+          }
         }
       },
       async deleteUser(userId) {
         try {
-          await this.$http.delete(`/users/${userId}`); // Endpoint correto conforme definido no Laravel
-          this.users = this.users.filter(user => user.id !== userId); // Remove usuário da lista local
+          await this.$http.delete(`/users/${userId}`);
+          this.users = this.users.filter(user => user.id !== userId);
         } catch (error) {
           console.error('Erro ao excluir usuário:', error);
         }
       },
       editUser(user) {
-        // Preenche o formulário com os dados do usuário selecionado para edição
         this.editingUser = user;
         this.formData.name = user.name;
         this.formData.email = user.email;
-        // Senha não é preenchida para edição por questões de segurança ou política de senha
       },
       resetForm() {
-        // Reseta o formulário e o usuário em edição
         this.formData = { name: '', email: '', password: '' };
         this.editingUser = null;
       }
@@ -101,7 +104,6 @@
   </script>
   
   <style scoped>
-  /* Estilos específicos para esta componente */
   .users {
     text-align: center;
     margin-top: 20px;
