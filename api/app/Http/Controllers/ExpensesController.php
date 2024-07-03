@@ -11,18 +11,19 @@ class ExpensesController extends Controller
 {
     public function index()
     {
-        $expenses = Auth::user()->expenses()->get();
+        $user = Auth::user();
+        $expenses = Expenses::where('user_id', $user->id)->get();
         
         if (is_null($expenses->first())) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'No product found!',
+                'message' => 'No expense found!',
             ], 200);
         }
 
         $response = [
             'status' => 'success',
-            'message' => 'Products are retrieved successfully.',
+            'message' => 'Expenses are retrieved successfully.',
             'data' => $expenses,
         ];
 
@@ -33,7 +34,7 @@ class ExpensesController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'descriptions' => 'required|string|max:250',
-            'price' => 'required|'
+            'price' => 'required|numeric'
         ]);
 
         if($validate->fails()){  
@@ -44,11 +45,12 @@ class ExpensesController extends Controller
             ], 403);    
         }
 
-        $expense = Expenses::create($request->all());
+        $user = Auth::user();
+        $expense = Expenses::create(array_merge($request->all(), ['user_id' => $user->id]));
 
         $response = [
             'status' => 'success',
-            'message' => 'Product is added successfully.',
+            'message' => 'Expense added successfully.',
             'data' => $expense,
         ];
 
@@ -62,13 +64,13 @@ class ExpensesController extends Controller
         if (is_null($expense)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Product is not found!',
+                'message' => 'expense not found!',
             ], 200);
         }
 
         $response = [
             'status' => 'success',
-            'message' => 'Product is retrieved successfully.',
+            'message' => 'expense retrieved successfully.',
             'data' => $expense,
         ];
         
@@ -95,7 +97,7 @@ class ExpensesController extends Controller
         if (is_null($expense)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Product is not found!',
+                'message' => 'expense not found!',
             ], 200);
         }
 
@@ -103,7 +105,7 @@ class ExpensesController extends Controller
         
         $response = [
             'status' => 'success',
-            'message' => 'Product is updated successfully.',
+            'message' => 'expense updated successfully.',
             'data' => $expense,
         ];
 
@@ -117,14 +119,14 @@ class ExpensesController extends Controller
         if (is_null($expense)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Product is not found!',
+                'message' => 'expense not found!',
             ], 200);
         }
 
         Expenses::destroy($id);
         return response()->json([
             'status' => 'success',
-            'message' => 'Product is deleted successfully.'
+            'message' => 'expense deleted successfully.'
             ], 200);
     }
 
@@ -136,13 +138,13 @@ class ExpensesController extends Controller
         if (is_null($expenses->first())) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'No product found!',
+                'message' => 'No expense found!',
             ], 200);
         }
 
         $response = [
             'status' => 'success',
-            'message' => 'Products are retrieved successfully.',
+            'message' => 'expenses are retrieved successfully.',
             'data' => $expenses,
         ];
 

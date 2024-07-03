@@ -21,12 +21,12 @@ export default {
   },
   methods: {
     async login() {
-      try {
-        await this.$store.dispatch('login', this.formData);
-        this.$router.push({ path: '/' });
-      } catch (error) {
-        console.error("Erro ao fazer login:", error);
-      }
+        try {
+            await this.$store.dispatch('login', this.formData); // Chama a action 'login'
+            this.$router.push('/'); // Redireciona após o login
+        } catch (error) {
+            console.error('Erro durante o login:', error);
+        }
     }
   }
 };

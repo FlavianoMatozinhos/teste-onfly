@@ -1,13 +1,74 @@
 <template>
   <div class="home">
-      Home
+    <h2>Home</h2>
+    <button @click="goToUsers">Gerenciar Usuários</button>
+    <div v-if="expenses.length">
+      <h3>Suas Despesas</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Descrição</th>
+            <th>Preço</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="expense in expenses" :key="expense.id">
+            <td>{{ expense.descriptions }}</td>
+            <td>{{ expense.price }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div v-else>
+      <p>Você não possui despesas cadastradas.</p>
+    </div>
   </div>
 </template>
 
 <script>
-
 export default {
+  data() {
+    return {
+      expenses: []
+    };
+  },
+  created() {
+    this.loadExpenses();
+  },
+  methods: {
+    goToUsers() {
+      this.$router.push('/users'); // Navega para a rota '/users'
+    },
+    async loadExpenses() {
+      try {
+        const response = await this.$http.get('/expenses');
+        this.expenses = response.data.data;
+      } catch (error) {
+        console.error('Erro ao carregar despesas:', error);
+      }
+    }
+  }
+};
+</script>
 
+<style scoped>
+.home {
+  text-align: center;
+  margin-top: 20px;
 }
 
-</script>
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+</style>
