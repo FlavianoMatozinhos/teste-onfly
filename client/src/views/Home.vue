@@ -16,7 +16,7 @@
         </thead>
         <tbody>
           <tr v-for="expense in expenses" :key="expense.id">
-            <td>{{ expense.description }}</td> <!-- Corrected typo in 'description' -->
+            <td>{{ expense.descriptions }}</td> <!-- Corrected typo in 'description' -->
             <td>{{ expense.price }}</td>
           </tr>
         </tbody>
