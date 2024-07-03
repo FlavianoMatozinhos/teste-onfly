@@ -6,6 +6,7 @@ use App\Models\Expenses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class ExpensesController extends Controller
 {
@@ -32,21 +33,25 @@ class ExpensesController extends Controller
 
     public function store(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'descriptions' => 'required|string|max:250',
-            'price' => 'required|numeric'
-        ]);
+        $validate = $this->validateExpenseData($request);
 
-        if($validate->fails()){  
+        if ($validate->fails()) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Validation Error!',
                 'data' => $validate->errors(),
-            ], 403);    
+            ], 403);
         }
 
         $user = Auth::user();
-        $expense = Expenses::create(array_merge($request->all(), ['user_id' => $user->id]));
+        $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
+
+        $expense = Expenses::create([
+            'descriptions' => $request->descriptions,
+            'user_id' => $user->id,
+            'price' => $request->price,
+            'expense_date' => $expenseDate->format('Y-m-d'),
+        ]);
 
         $response = [
             'status' => 'success',
@@ -55,6 +60,30 @@ class ExpensesController extends Controller
         ];
 
         return response()->json($response, 200);
+    }
+
+    private function validateExpenseData(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'descriptions' => 'required|string|max:250',
+            'price' => 'required|numeric',
+            'expense_date' => 'required|date_format:d/m/Y',
+        ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $this->validateExpenseDateIsNotFuture($validator, $request->expense_date);
+        });
+
+        return $validator;
+    }
+
+    private function validateExpenseDateIsNotFuture($validator, $expenseDate)
+    {
+        $parsedDate = Carbon::createFromFormat('d/m/Y', $expenseDate);
+
+        if ($parsedDate->isFuture()) {
+            $validator->errors()->add('expense_date', 'The expense date cannot be in the future.');
+        }
     }
 
     public function show($id)
@@ -79,12 +108,9 @@ class ExpensesController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validate = Validator::make($request->all(), [
-            'descriptions' => 'required',
-            'price' => 'required',
-        ]);
+        $validate = $this->validateExpenseData($request);
 
-        if($validate->fails()){  
+        if ($validate->fails()) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Validation Error!',
@@ -97,15 +123,29 @@ class ExpensesController extends Controller
         if (is_null($expense)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'expense not found!',
-            ], 200);
+                'message' => 'Expense not found!',
+            ], 404);
         }
 
-        $expense->update($request->all());
-        
+        $user = Auth::user();
+        if ($expense->user_id !== $user->id) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Expense not found. Unable to update.',
+            ], 403);
+        }
+
+        $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
+        $expense->fill([
+            'descriptions' => $request->descriptions,
+            'price' => $request->price,
+            'expense_date' => $expenseDate->format('Y-m-d'),
+        ]);
+        $expense->save();
+
         $response = [
             'status' => 'success',
-            'message' => 'expense updated successfully.',
+            'message' => 'Expense updated successfully.',
             'data' => $expense,
         ];
 
@@ -115,19 +155,28 @@ class ExpensesController extends Controller
     public function destroy($id)
     {
         $expense = Expenses::find($id);
-  
+    
         if (is_null($expense)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'expense not found!',
-            ], 200);
+                'message' => 'Expense not found.',
+            ], 404);
         }
-
+    
+        $user = Auth::user();
+        if ($expense->user_id !== $user->id) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Expense not found. Unable to deleted.',
+            ], 403);
+        }
+    
         Expenses::destroy($id);
+    
         return response()->json([
             'status' => 'success',
-            'message' => 'expense deleted successfully.'
-            ], 200);
+            'message' => 'Expense deleted successfully.',
+        ], 200);
     }
 
     public function search($name)
