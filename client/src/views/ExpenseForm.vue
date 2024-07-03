@@ -12,7 +12,7 @@
         </div>
         <div>
           <label for="expense_date">Data da Despesa:</label>
-          <DatePicker v-model="form.expense_date" :first-day-of-week="1" format="dd/MM/yyyy"></DatePicker>
+          <DatePicker v-model="form.expense_date" type="date" :disabled-date="disabledDates"></DatePicker>
         </div>
         <div>
           <button type="submit">Cadastrar Despesa</button>
@@ -20,6 +20,7 @@
       </form>
     </div>
   </template>
+  
   
   <script>
   import DatePicker from 'vue2-datepicker';
@@ -39,19 +40,22 @@
       };
     },
     methods: {
-      async submitExpense() {
-        try {
-          const response = await this.$http.post('/expenses', this.form);
-          console.log('Expense added:', response.data);
-          this.$emit('expense-added', response.data.data); // Emit event to parent component
-          this.form.descriptions = '';
-          this.form.price = null;
-          this.form.expense_date = '';
-        } catch (error) {
-          console.error('Erro ao cadastrar despesa:', error);
-          // Handle error display or other actions as needed
+        async submitExpense() {
+            try {
+            const response = await this.$http.post('/expenses', this.form);
+            console.log('Expense added:', response.data);
+            this.$emit('expense-added', response.data.data); // Emit event to parent component
+            this.form.descriptions = '';
+            this.form.price = null;
+            this.form.expense_date = '';
+            } catch (error) {
+            console.error('Erro ao cadastrar despesa:', error);
+            // Handle error display or other actions as needed
+            }
+        },
+        disabledDates(date) {
+            return date.getTime() > new Date().getTime(); // Disable future dates
         }
-      }
     }
   };
   </script>
