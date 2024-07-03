@@ -11,7 +11,8 @@ class ExpensesController extends Controller
 {
     public function index()
     {
-        $expenses = Expenses::all();
+        $user = Auth::user();
+        $expenses = Expenses::where('user_id', $user->id)->get();
         
         if (is_null($expenses->first())) {
             return response()->json([
@@ -22,7 +23,7 @@ class ExpensesController extends Controller
 
         $response = [
             'status' => 'success',
-            'message' => 'expenses are retrieved successfully.',
+            'message' => 'Expenses are retrieved successfully.',
             'data' => $expenses,
         ];
 
@@ -33,7 +34,7 @@ class ExpensesController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'descriptions' => 'required|string|max:250',
-            'price' => 'required|'
+            'price' => 'required|numeric'
         ]);
 
         if($validate->fails()){  
@@ -44,11 +45,12 @@ class ExpensesController extends Controller
             ], 403);    
         }
 
-        $expense = Expenses::create($request->all());
+        $user = Auth::user();
+        $expense = Expenses::create(array_merge($request->all(), ['user_id' => $user->id]));
 
         $response = [
             'status' => 'success',
-            'message' => 'expense added successfully.',
+            'message' => 'Expense added successfully.',
             'data' => $expense,
         ];
 
