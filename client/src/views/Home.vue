@@ -13,7 +13,7 @@
         </thead>
         <tbody>
           <tr v-for="expense in expenses" :key="expense.id">
-            <td>{{ expense.descriptions }}</td>
+            <td>{{ expense.description }}</td> <!-- Corrected typo in 'description' -->
             <td>{{ expense.price }}</td>
           </tr>
         </tbody>
@@ -22,6 +22,9 @@
     <div v-else>
       <p>Você não possui despesas cadastradas.</p>
     </div>
+    <div v-if="error">
+      <p>{{ errorMessage }}</p>
+    </div>
   </div>
 </template>
 
@@ -29,7 +32,9 @@
 export default {
   data() {
     return {
-      expenses: []
+      expenses: [],
+      error: false,
+      errorMessage: ''
     };
   },
   created() {
@@ -37,7 +42,7 @@ export default {
   },
   methods: {
     goToUsers() {
-      this.$router.push('/users'); // Navega para a rota '/users'
+      this.$router.push('/users');
     },
     async loadExpenses() {
       try {
@@ -45,6 +50,8 @@ export default {
         this.expenses = response.data.data;
       } catch (error) {
         console.error('Erro ao carregar despesas:', error);
+        this.error = true;
+        this.errorMessage = 'Erro ao carregar despesas. Por favor, tente novamente mais tarde.';
       }
     }
   }
