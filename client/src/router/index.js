@@ -15,7 +15,7 @@ const router = new Router({
             path: '/',
             name: 'Home',
             component: Home,
-            meta: { requiresAuth: true } // Exemplo de rota protegida que requer autenticação
+            meta: { requiresAuth: true }
         },
         {
             path: '/login',
@@ -31,6 +31,7 @@ const router = new Router({
             path: '/users',
             name: 'Users',
             component: Users,
+            meta: { requiresAuth: true }
         },
     ],
 });
