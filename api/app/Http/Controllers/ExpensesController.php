@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expenses;
+use App\Notifications\ExpenseCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -53,13 +54,15 @@ class ExpensesController extends Controller
             'expense_date' => $expenseDate->format('Y-m-d'),
         ]);
 
+        $user->notify(new ExpenseCreatedNotification($expense));
+
         $response = [
             'status' => 'success',
             'message' => 'Expense added successfully.',
             'data' => $expense,
         ];
 
-        return response()->json($response, 200);
+        return response()->json($response, 201);
     }
 
     private function validateExpenseData(Request $request)
