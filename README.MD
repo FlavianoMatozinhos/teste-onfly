@@ -172,7 +172,7 @@ OBS(Irá aparecer a opção de criar migrations, digitar YES /  Irá aparecer a 
 ![despesa-1](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/6e326865-e104-49fa-847f-e481cb188d22)
 
 
-- Para cadastrar uma despesa você precisa de uma descrição, o valor e a data que ocorreu a despesa. Obs(O valor não pode ser negativo e a data não poderá ser futura).
+- Para cadastrar uma despesa você precisa de uma descrição, o valor e a data que ocorreu a despesa.
 ![data-despesa](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/fa490a69-d500-4a22-9c35-b91a7ef13108)
 
 
