@@ -34,47 +34,107 @@ Certifique-se de ter as seguintes ferramentas instaladas em seu sistema:
 
 
 3. **Instalação das Dependências**
-- composer install (No arquivo BackEnd - api)
-- npm install (No arquivo FrontEnd - client)
-- npm install axios (No arquivo FrontEnd - client)
+    ```
+        - composer install (No arquivo BackEnd - api)
+    ```
+
+    ```
+        - npm install (No arquivo FrontEnd - client)
+    ```
+
+    ```
+        - npm install axios (No arquivo FrontEnd - client)
+    ```
 
 
 4. **Geração da Chave de Aplicação**
-- php artisan key:generate - (No arquivo BackEnd - api)
-
+    ```
+        - php artisan key:generate - (No arquivo BackEnd - api)
+    ```
 
 5. **Migração do Banco de Dados**
-- php artisan migrate - (No arquivo BackEnd - api)
-
+    ```
+        - php artisan migrate - (No arquivo BackEnd - api)
+    ```
 
 6. **Instalação do Passport**
-- composer require laravel/passport - (No arquivo BackEnd - api)
-
+    ```
+        - composer require laravel/passport - (No arquivo BackEnd - api)
+    ```
 
 7. **Instalação do Passport pt2**
-- php artisan passport:install - OBS(Irá aparecer a opção de criar migrations, digitar YES /  Irá aparecer a opção de Criar KEYS para o Client, digitar YES) - (No arquivo BackEnd - api)
+    ```
+    - php artisan passport:install
+    ```
+OBS(Irá aparecer a opção de criar migrations, digitar YES /  Irá aparecer a opção de Criar KEYS para o Client, digitar YES) - (No arquivo BackEnd - api)
 
 
 8. **Instalação do Sanctum**
-- composer require laravel/sanctum - (No arquivo BackEnd - api)
+    ```
+        - composer require laravel/sanctum - (No arquivo BackEnd - api)
+    ```
 
 
 9. **Instalação do Swagger**
-- composer require darkaonline/l5-swagger - (No arquivo BackEnd - api)
-- php artisan l5-swagger:generate - (No arquivo BackEnd - api)
+    ```
+        - composer require darkaonline/l5-swagger - (No arquivo BackEnd - api)
+    ```
+    ```
+         - php artisan l5-swagger:generate - (No arquivo BackEnd - api)
+    ```
 
 
 10. **Execução do Worker de Filas**
-- php artisan queue:work --queue=default - (No arquivo BackEnd - api)
-
+    ```
+        - php artisan queue:work --queue=default - (No arquivo BackEnd - api)
+    ```
 
 11. **Compilação dos Assets (para projetos Vue.js)**
-- npm run serve ou npm run dev - (No arquivo FrontEnd - client)
+    ```
+        - npm run serve ou npm run dev - (No arquivo FrontEnd - client)
+    ```
 
+## TESTES UNITARIOS DO BACKEND (arquivo api)
+- Para que os testes ocorram de forma correta
 
-12. **Execução dos testes**
-- php artisan test - (No arquivo BackEnd - api)
+1. Precisa ter os arquivos .env.testing.
+    ```
+        APP_ENV=testing
+        APP_KEY=base64:
+        DB_CONNECTION=sqlite
+        DB_DATABASE=:memory:
+        CACHE_DRIVER=array
+        SESSION_DRIVER=array
+    ```
 
+2. É preciso criar uma chave para o env de teste.
+    ```
+        php artisan key:generate --env=testing
+    ```
+
+3. Ajustar o arquivo phpunit.xml para que os testes ocorram em um banco de dados "ficticio".
+    ```
+        <php>
+            <env name="APP_ENV" value="testing"/>
+            <env name="BCRYPT_ROUNDS" value="4"/>
+            <env name="CACHE_DRIVER" value="array"/>
+            <env name="DB_CONNECTION" value="sqlite"/>
+            <env name="DB_DATABASE" value=":memory:"/>
+            <env name="MAIL_MAILER" value="array"/>
+            <env name="QUEUE_CONNECTION" value="sync"/>
+            <env name="SESSION_DRIVER" value="array"/>
+            <env name="TELESCOPE_ENABLED" value="false"/>
+        </php>
+    ```
+4. Criar as tabelas do banco de dados.
+    ```
+        php artisan migrate --env=testing  
+    ```
+
+5. Agora é só rodar os teste
+    ```
+        php artisan test 
+    ```
 
 ## USO
 - Acessando a tela principal, você será redirecionado para a tela de Login, se você já tenha usuario cadastrado, basta informar email e senha.
@@ -133,86 +193,85 @@ Certifique-se de ter as seguintes ferramentas instaladas em seu sistema:
 
 ## CURLS da API
 - post /api/register
-<span> 
-curl --location 'http://127.0.0.1:8000/api/register' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "name": "teste",
-    "email": "teste@gmail.com",
-    "password": "123456789"
-}'
-</span>
+    ```
+        curl --location 'http://127.0.0.1:8000/api/register' \
+        --header 'Accept: application/json' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "name": "teste",
+            "email": "teste@gmail.com",
+            "password": "123456789"
+        }'
+    ```
 
 
 - post /api/login
-<span> 
-curl --location 'http://localhost:8000/api/login' \
---header 'Content-Type: application/json' \
---data-raw '{
-   "email": "teste@gmail.com",
-    "password": "123456789"
-}'
-</span>
+    ```
+        curl --location 'http://localhost:8000/api/login' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+        "email": "teste@gmail.com",
+            "password": "123456789"
+        }'
+    ```
 
 
 - post /api/logout
-<span> 
-curl --location --request POST 'http://localhost:8000/api/logout' \
---header 'Authorization: Bearer {seu_token}' \
---header 'Accept: application/json' \
---data ''
-</span>
+    ```
+        curl --location --request POST 'http://localhost:8000/api/logout' \
+        --header 'Authorization: Bearer {seu_token}' \
+        --header 'Accept: application/json' \
+        --data ''
+    ```
 
 
 - get /api/users
-<span> 
-curl --location 'http://localhost:8000/api/users' \
---header 'Accept: application/json'
-</span>
+    ```
+        curl --location 'http://localhost:8000/api/users' \
+        --header 'Accept: application/json'
+    ```
 
 
 - get /api/expenses
-<span> 
-curl --location 'http://localhost:8000/api/expenses' \
---header 'Accept: application/json' \
---header 'Authorization: ••••••' \
---data ''
-</span>
+    ```
+        curl --location 'http://localhost:8000/api/expenses' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: ••••••' \
+        --data ''
+    ```
 
 
 - post /api/expenses
-<span> 
-curl --location 'http://localhost:8000/api/expenses' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---header 'Authorization: ••••••' \
---data '{
-    "descriptions": "teste",
-    "price": "12345678",
-    "expense_date": "03/12/2023"
-}'
-</span>
-
+    ```
+        curl --location 'http://localhost:8000/api/expenses' \
+        --header 'Accept: application/json' \
+        --header 'Content-Type: application/json' \
+        --header 'Authorization: ••••••' \
+        --data '{
+            "descriptions": "teste",
+            "price": "12345678",
+            "expense_date": "03/12/2023"
+        }'
+    ```
 
 - put /api/expenses/{id}
-<span> 
-curl --location --request PUT 'http://localhost:8000/api/expenses/1' \
---header 'Accept: application/json' \
---header 'Content-Type: application/json' \
---header 'Authorization: ••••••' \
---data '{
-    "descriptions": "teste",
-    "price": "1111",
-    "expense_date": "05/01/2024"
-}'
-</span>
+    ```
+        curl --location --request PUT 'http://localhost:8000/api/expenses/1' \
+        --header 'Accept: application/json' \
+        --header 'Content-Type: application/json' \
+        --header 'Authorization: ••••••' \
+        --data '{
+            "descriptions": "teste",
+            "price": "1111",
+            "expense_date": "05/01/2024"
+        }'
+    ```
 
 
 - delete /api/expenses/{id}
-<span> 
-curl --location --request DELETE 'http://localhost:8000/api/expenses/1' \
---header 'Accept: application/json' \
---header 'Authorization: ••••••' \
---data ''
-</span>
+    ```
+        curl --location --request DELETE 'http://localhost:8000/api/expenses/1' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: ••••••' \
+        --data ''
+    ```
