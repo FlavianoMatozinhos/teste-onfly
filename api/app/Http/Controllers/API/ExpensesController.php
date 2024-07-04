@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
+use App\Jobs\SendExpenseCreatedEmail;
 use App\Models\Expenses;
 use App\Notifications\ExpenseCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 
 class ExpensesController extends Controller
 {
@@ -54,7 +56,7 @@ class ExpensesController extends Controller
             'expense_date' => $expenseDate->format('Y-m-d'),
         ]);
 
-        $user->notify(new ExpenseCreatedNotification($expense));
+        SendExpenseCreatedEmail::dispatch($expense);
 
         $response = [
             'status' => 'success',
@@ -180,26 +182,5 @@ class ExpensesController extends Controller
             'status' => 'success',
             'message' => 'Expense deleted successfully.',
         ], 200);
-    }
-
-    public function search($name)
-    {
-        $expenses = Expenses::where('descriptions', 'like', '%'.$name.'%')
-            ->latest()->get();
-
-        if (is_null($expenses->first())) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'No expense found!',
-            ], 200);
-        }
-
-        $response = [
-            'status' => 'success',
-            'message' => 'expenses are retrieved successfully.',
-            'data' => $expenses,
-        ];
-
-        return response()->json($response, 200);
     }
 }
