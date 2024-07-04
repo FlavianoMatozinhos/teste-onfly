@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 
 class UserController extends Controller
 {
@@ -14,7 +15,7 @@ class UserController extends Controller
         $this->authorize('viewAny', User::class);
         
         $users = User::all();
-        return response()->json($users);
+        return UserResource::collection($users);
     }
 
     public function store(Request $request)
@@ -33,14 +34,14 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json($user, 201);
+        return new UserResource($user);
     }
 
     public function show(User $user)
     {
         $this->authorize('view', $user);
         
-        return $user;
+        return new UserResource($user);
     }
 
     public function update(Request $request, $id)
@@ -61,7 +62,7 @@ class UserController extends Controller
         }
         $user->save();
     
-        return response()->json($user);
+        return new UserResource($user);
     }
 
     public function destroy(User $user)

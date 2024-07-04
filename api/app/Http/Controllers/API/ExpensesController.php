@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Expenses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
-use App\Models\Expenses;
+use App\Http\Resources\ExpenseResource;
 
 class ExpensesController extends Controller
 {
@@ -23,13 +24,7 @@ class ExpensesController extends Controller
             ], 404);
         }
 
-        $response = [
-            'status' => 'success',
-            'message' => 'Expenses retrieved successfully.',
-            'data' => $expenses,
-        ];
-
-        return response()->json($response, 200);
+        return ExpenseResource::collection($expenses);
     }
 
     public function store(Request $request)
@@ -51,24 +46,14 @@ class ExpensesController extends Controller
             'expense_date' => $expenseDate->format('Y-m-d'),
         ]);
 
-        $response = [
-            'status' => 'success',
-            'message' => 'Expense added successfully.',
-            'data' => $expense,
-        ];
-
-        return response()->json($response, 201);
+        return new ExpenseResource($expense);
     }
 
     public function show(Expenses $expense)
     {
         $this->authorize('view', $expense);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Expense retrieved successfully.',
-            'data' => $expense,
-        ], 200);
+        return new ExpenseResource($expense);
     }
 
     public function update(Request $request, Expenses $expense)
@@ -87,13 +72,7 @@ class ExpensesController extends Controller
         $expense->expense_date = $expenseDate->format('Y-m-d');
         $expense->save();
 
-        $response = [
-            'status' => 'success',
-            'message' => 'Expense updated successfully.',
-            'data' => $expense,
-        ];
-
-        return response()->json($response, 200);
+        return new ExpenseResource($expense);
     }
 
     public function destroy(Expenses $expense)
