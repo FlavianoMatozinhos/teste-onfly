@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
-
 use App\Http\Controllers\Auth\LoginRegisterController;
 use App\Models\Expenses;
 use App\Models\User;
@@ -11,7 +9,6 @@ use App\Policies\AuthPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Policies\ExpensePolicy;
 use App\Policies\UserPolicy;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {

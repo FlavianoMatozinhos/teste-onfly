@@ -8,12 +8,12 @@ class UserFormRequest extends FormRequest
 {
     public function authorize()
     {
-        return true; // Pode ser ajustado conforme suas regras de autorização
+        return true;
     }
 
     public function rules()
     {
-        $userId = $this->route('user') ?? null; // Obtém o ID do usuário da rota, se existir
+        $userId = $this->route('user') ?? null;
 
         return [
             'name' => 'required|string|max:255',

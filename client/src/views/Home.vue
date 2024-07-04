@@ -34,7 +34,6 @@
       <p>{{ errorMessage }}</p>
     </div>
 
-    <!-- Modal de Edição -->
     <expense-edit-modal
       :show-modal="showModal"
       :expense="selectedExpense"
@@ -81,8 +80,6 @@ export default {
         }
       } catch (error) {
         this.expenses = [];
-        this.error = true;
-        this.errorMessage = 'Erro ao carregar despesas. Por favor, tente novamente mais tarde.';
       }
     },
     editExpense(expense) {

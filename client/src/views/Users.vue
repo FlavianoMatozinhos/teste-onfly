@@ -49,7 +49,7 @@ export default {
       formData: { name: '', email: '', password: '' },
       editingUser: null,
       alertMessage: '',
-      alertType: '' // 'success' or 'error'
+      alertType: ''
     };
   },
   created() {

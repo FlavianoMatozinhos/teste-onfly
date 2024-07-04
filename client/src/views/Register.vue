@@ -37,7 +37,7 @@
           password: ''
         },
         alertMessage: '',
-        alertType: '' // 'alert-success' or 'alert-danger'
+        alertType: ''
       };
     },
     methods: {
@@ -55,7 +55,7 @@
           this.alertType = 'alert-success';
           setTimeout(() => {
             this.$router.push({ name: 'Login' });
-          }, 2000); // Redireciona após 2 segundos (opcional)
+          }, 2000);
         } catch (error) {
           console.log(error.response);
           if (error.response.status === 500) {

@@ -51,32 +51,28 @@ export default {
   watch: {
     expense: {
       handler(newVal) {
-        // Atualiza o objeto editedExpense com os novos valores da despesa
         this.editedExpense = { ...newVal };
-        // Formata a data para exibir no DatePicker
         this.selectedDate = moment(newVal.expense_date).format('DD/MM/YYYY');
       },
-      immediate: true // Para que o watch seja executado imediatamente ao carregar o componente
+      immediate: true
     },
     selectedDate(newVal) {
-      // Converte a data selecionada de DD/MM/YYYY para YYYY-MM-DD antes de salvar
-      this.editedExpense.expense_date = moment(newVal, 'DD/MM/YYYY').format('YYYY-MM-DD');
+      this.editedExpense.expense_date = moment(newVal, 'DD/MM/YYYY').format('DD/MM/YYYY');
     }
   },
   methods: {
     closeModal() {
       this.$emit('close');
-      this.editedExpense = {}; // Limpa o objeto editedExpense ao fechar o modal
+      this.editedExpense = {};
     },
     async saveExpense() {
       try {
-        // Envia a requisição para atualizar a despesa
-        const response = await this.$http.post(`/expenses/${this.editedExpense.id}`, {
+        const response = await this.$http.put(`/expenses/${this.editedExpense.id}`, {
           ...this.editedExpense,
-          expense_date: this.editedExpense.expense_date // Garante que a data esteja no formato YYYY-MM-DD
+          expense_date: this.editedExpense.expense_date
         });
-        this.$emit('update', response.data); // Emite evento para atualizar dados
-        this.closeModal(); // Fecha o modal após salvar
+        this.$emit('update', response.data);
+        this.closeModal();
         alert('Despesa atualizada com sucesso.');
       } catch (error) {
         console.error('Erro ao atualizar despesa:', error);
@@ -92,15 +88,15 @@ export default {
 
 <style scoped>
 .modal {
-  display: block; /* Ensure modal is displayed */
-  position: fixed; /* Fixed position */
-  z-index: 1; /* Stay on top */
+  display: block;
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scrolling if needed */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
 }
 
 .modal-dialog {

@@ -1,4 +1,3 @@
-// src/plugins/axios.js
 import axios from 'axios';
 import store from '../store';
 

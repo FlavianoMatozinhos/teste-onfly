@@ -21,7 +21,6 @@
       </div>
     </form>
 
-    <!-- Alertas -->
     <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
     <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
   </div>
@@ -64,13 +63,11 @@ export default {
       this.errorMessage = '';
       this.successMessage = '';
 
-      // Validar descrição
       if (this.form.descriptions.length > 191) {
         this.errorMessage = 'A descrição não pode ter mais de 191 caracteres.';
         return;
       }
 
-      // Validar preço
       const price = parseFloat(this.form.price.replace(/[^\d,-]/g, '').replace(',', '.'));
       if (isNaN(price) || price < 0) {
         this.errorMessage = 'Por favor, insira um preço válido.';
@@ -78,8 +75,7 @@ export default {
       }
 
       try {
-        // Format the date before sending it to the server
-        this.form.expense_date = moment(this.form.expense_date).format('YYYY-MM-DD');
+        this.form.expense_date = moment(this.form.expense_date).format('DD/MM/YYYY');
 
         const response = await this.$http.post('/expenses', { ...this.form, price });
         console.log('Expense added:', response.data);
