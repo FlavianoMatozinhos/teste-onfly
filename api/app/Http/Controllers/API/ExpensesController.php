@@ -13,6 +13,38 @@ use Illuminate\Support\Facades\Log;
 
 class ExpensesController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/expenses",
+     *     summary="List all expenses",
+     *     tags={"Expenses"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of expenses",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/ExpenseFormRequest")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No expenses found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="failed"),
+     *             @OA\Property(property="message", type="string", example="No expense found!")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to fetch expenses",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Failed to fetch expenses!")
+     *         ),
+     *     ),
+     * )
+     */
     public function index()
     {
         try {
@@ -30,7 +62,7 @@ class ExpensesController extends Controller
 
             return ExpenseResource::collection($expenses);
         } catch (\Exception $e) {
-            Log::error('Error fetching expenses: '.$e->getMessage());
+            Log::error('Error fetching expenses: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to fetch expenses!',
@@ -38,6 +70,26 @@ class ExpensesController extends Controller
         }
     }
 
+/**
+ * @OA\Post(
+ *     path="/expenses",
+ *     summary="Create a new expense",
+ *     tags={"Expenses"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(ref="#/components/schemas/ExpenseFormRequest")
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Failed to create expense",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="string", example="error"),
+ *             @OA\Property(property="message", type="string", example="Failed to create expense!")
+ *         )
+ *     )
+ * )
+ */
     public function store(ExpenseFormRequest $request)
     {
         try {
@@ -49,7 +101,7 @@ class ExpensesController extends Controller
 
             return new ExpenseResource($expense);
         } catch (\Exception $e) {
-            Log::error('Error creating expense: '.$e->getMessage());
+            Log::error('Error creating expense: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to create expense!',
@@ -57,6 +109,50 @@ class ExpensesController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/expenses/{expense}",
+     *     summary="Display the specified expense",
+     *     tags={"Expenses"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="expense",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the expense",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Expense details",
+     *         @OA\JsonContent(ref="#/components/schemas/ExpenseFormRequest"),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized access to expense",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthorized access to expense!")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Expense not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="failed"),
+     *             @OA\Property(property="message", type="string", example="Expense not found!")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to fetch expense",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Failed to fetch expense!")
+     *         ),
+     *     ),
+     * )
+     */
     public function show(Expenses $expense)
     {
         try {
@@ -64,7 +160,7 @@ class ExpensesController extends Controller
 
             return new ExpenseResource($expense);
         } catch (\Exception $e) {
-            Log::error('Error fetching expense: '.$e->getMessage());
+            Log::error('Error fetching expense: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to fetch expense!',
@@ -72,6 +168,49 @@ class ExpensesController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     *     path="/expenses/{expense}",
+     *     summary="Update the specified expense",
+     *     tags={"Expenses"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="expense",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the expense",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/ExpenseFormRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized update of expense",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthorized update of expense!")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Expense not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="failed"),
+     *             @OA\Property(property="message", type="string", example="Expense not found!")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to update expense",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Failed to update expense!")
+     *         ),
+     *     ),
+     * )
+     */
     public function update(ExpenseFormRequest $request, Expenses $expense)
     {
         try {
@@ -80,7 +219,7 @@ class ExpensesController extends Controller
 
             return new ExpenseResource($expense);
         } catch (\Exception $e) {
-            Log::error('Error updating expense: '.$e->getMessage());
+            Log::error('Error updating expense: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update expense!',
@@ -88,6 +227,53 @@ class ExpensesController extends Controller
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/expenses/{expense}",
+     *     summary="Delete the specified expense",
+     *     tags={"Expenses"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="expense",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the expense",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Expense deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Expense deleted successfully.")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized deletion of expense",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthorized deletion of expense!")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Expense not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="failed"),
+     *             @OA\Property(property="message", type="string", example="Expense not found!")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to delete expense",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Failed to delete expense!")
+     *         ),
+     *     ),
+     * )
+     */
     public function destroy(Expenses $expense)
     {
         try {
@@ -100,7 +286,7 @@ class ExpensesController extends Controller
                 'message' => 'Expense deleted successfully.',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting expense: '.$e->getMessage());
+            Log::error('Error deleting expense: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to delete expense!',
