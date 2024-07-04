@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ExpenseResource;
 use App\Http\Requests\ExpenseFormRequest;
+use App\Jobs\SendExpenseCreatedEmail;
 use Illuminate\Support\Facades\Log;
 
 class ExpensesController extends Controller
@@ -43,6 +44,8 @@ class ExpensesController extends Controller
             $this->authorize('create', Expenses::class);
 
             $expense = $this->createExpense($request);
+
+            SendExpenseCreatedEmail::dispatch($expense);
 
             return new ExpenseResource($expense);
         } catch (\Exception $e) {
