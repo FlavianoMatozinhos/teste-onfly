@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ExpenseResource;
+use App\Http\Requests\ExpenseFormRequest;
 
 class ExpensesController extends Controller
 {
@@ -27,15 +28,9 @@ class ExpensesController extends Controller
         return ExpenseResource::collection($expenses);
     }
 
-    public function store(Request $request)
+    public function store(ExpenseFormRequest $request)
     {
         $this->authorize('create', Expenses::class);
-
-        $request->validate([
-            'descriptions' => 'required|string|max:250',
-            'price' => 'required|numeric',
-            'expense_date' => 'required|date_format:d/m/Y',
-        ]);
 
         $user = auth()->user();
         $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
@@ -56,15 +51,9 @@ class ExpensesController extends Controller
         return new ExpenseResource($expense);
     }
 
-    public function update(Request $request, Expenses $expense)
+    public function update(ExpenseFormRequest $request, Expenses $expense)
     {
         $this->authorize('update', $expense);
-
-        $request->validate([
-            'descriptions' => 'required|string|max:250',
-            'price' => 'required|numeric',
-            'expense_date' => 'required|date_format:d/m/Y',
-        ]);
 
         $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
         $expense->descriptions = $request->descriptions;
