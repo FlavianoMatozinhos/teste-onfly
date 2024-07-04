@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\Auth\LoginRegisterController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Models\Expenses;
 use App\Models\User;
 use App\Policies\AuthPolicy;
@@ -16,7 +16,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Expenses::class => ExpensePolicy::class,
         User::class => UserPolicy::class,
-        LoginRegisterController::class => AuthPolicy::class,
+        AuthController::class => AuthPolicy::class,
     ];
 
     public function boot(): void

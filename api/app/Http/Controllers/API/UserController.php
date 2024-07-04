@@ -33,12 +33,6 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
-            'password' => 'sometimes|required|string|min:8',
-        ]);
-
         $this->updateUser($request, $user);
 
         return new UserResource($user);
@@ -61,6 +55,12 @@ class UserController extends Controller
 
     private function updateUser(Request $request, User $user)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'password' => 'sometimes|required|string|min:8',
+        ]);
+
         $user->name = $request->name;
         $user->email = $request->email;
         if ($request->filled('password')) {

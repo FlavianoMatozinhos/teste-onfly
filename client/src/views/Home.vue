@@ -38,7 +38,7 @@
       :show-modal="showModal"
       :expense="selectedExpense"
       @close="closeModal"
-      @update="updateExpense"
+      @update="handleUpdateExpense"
     ></expense-edit-modal>
   </div>
 </template>
@@ -86,17 +86,16 @@ export default {
       this.selectedExpense = expense;
       this.showModal = true;
     },
-    async updateExpense(updatedExpense) {
+    async handleUpdateExpense(updatedExpense) {
       try {
-        const response = await this.$http.post(`/expenses/${updatedExpense.id}`, updatedExpense);
         const index = this.expenses.findIndex(expense => expense.id === updatedExpense.id);
         if (index !== -1) {
-          this.expenses.splice(index, 1, response.data);
+          this.expenses.splice(index, 1, updatedExpense);
         }
+        await this.loadExpenses();
         this.closeModal();
         alert('Despesa atualizada com sucesso.');
       } catch (error) {
-        console.error('Erro ao atualizar despesa:', error);
         alert('Erro ao atualizar despesa. Por favor, tente novamente mais tarde.');
       }
     },
@@ -107,7 +106,6 @@ export default {
           this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
           alert('Despesa excluída com sucesso.');
         } catch (error) {
-          console.error('Erro ao excluir despesa:', error);
           alert('Erro ao excluir despesa. Por favor, tente novamente mais tarde.');
         }
       }

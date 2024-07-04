@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterFormRequest;
 use App\Http\Requests\LoginFormRequest;
 
-class LoginRegisterController extends Controller
+class AuthController extends Controller
 {
     public function register(RegisterFormRequest $request)
     {

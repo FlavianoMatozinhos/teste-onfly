@@ -78,13 +78,11 @@ export default {
         this.form.expense_date = moment(this.form.expense_date).format('DD/MM/YYYY');
 
         const response = await this.$http.post('/expenses', { ...this.form, price });
-        console.log('Expense added:', response.data);
         this.$emit('expense-added', response.data.data);
         this.successMessage = 'Despesa cadastrada com sucesso!';
         this.resetForm();
       } catch (error) {
         this.errorMessage = 'Erro ao cadastrar despesa.';
-        console.error('Erro ao cadastrar despesa:', error);
       }
     },
     clearPriceErrors() {
@@ -126,7 +124,7 @@ export default {
 }
 
 .form-group label {
-  display: block;
+  display: flex;
   font-weight: bold;
   margin-bottom: 5px;
 }

@@ -8,61 +8,101 @@ use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ExpenseResource;
 use App\Http\Requests\ExpenseFormRequest;
+use Illuminate\Support\Facades\Log;
 
 class ExpensesController extends Controller
 {
     public function index()
     {
-        $this->authorize('viewAny', Expenses::class);
+        try {
+            $this->authorize('viewAny', Expenses::class);
 
-        $user = auth()->user();
-        $expenses = $user->expenses()->get();
-        
-        if ($expenses->isEmpty()) {
+            $user = auth()->user();
+            $expenses = $user->expenses()->get();
+
+            if ($expenses->isEmpty()) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'No expense found!',
+                ], 404);
+            }
+
+            return ExpenseResource::collection($expenses);
+        } catch (\Exception $e) {
+            Log::error('Error fetching expenses: '.$e->getMessage());
             return response()->json([
-                'status' => 'failed',
-                'message' => 'No expense found!',
-            ], 404);
+                'status' => 'error',
+                'message' => 'Failed to fetch expenses!',
+            ], 500);
         }
-
-        return ExpenseResource::collection($expenses);
     }
 
     public function store(ExpenseFormRequest $request)
     {
-        // $this->authorize('create', Expenses::class);
+        try {
+            $this->authorize('create', Expenses::class);
 
-        $expense = $this->createExpense($request);
+            $expense = $this->createExpense($request);
 
-        return new ExpenseResource($expense);
+            return new ExpenseResource($expense);
+        } catch (\Exception $e) {
+            Log::error('Error creating expense: '.$e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create expense!',
+            ], 500);
+        }
     }
 
     public function show(Expenses $expense)
     {
-        // $this->authorize('view', $expense);
+        try {
+            $this->authorize('view', $expense);
 
-        return new ExpenseResource($expense);
+            return new ExpenseResource($expense);
+        } catch (\Exception $e) {
+            Log::error('Error fetching expense: '.$e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch expense!',
+            ], 500);
+        }
     }
 
     public function update(ExpenseFormRequest $request, Expenses $expense)
     {
-        // $this->authorize('update', $expense);
+        try {
+            $this->authorize('update', $expense);
+            $this->updateExpense($request, $expense);
 
-        $this->updateExpense($request, $expense);
-
-        return new ExpenseResource($expense);
+            return new ExpenseResource($expense);
+        } catch (\Exception $e) {
+            Log::error('Error updating expense: '.$e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update expense!',
+            ], 500);
+        }
     }
 
     public function destroy(Expenses $expense)
     {
-        // $this->authorize('delete', $expense);
+        try {
+            $this->authorize('delete', $expense);
 
-        $expense->delete();
+            $expense->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Expense deleted successfully.',
-        ], 200);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Expense deleted successfully.',
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error deleting expense: '.$e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to delete expense!',
+            ], 500);
+        }
     }
 
     private function createExpense(ExpenseFormRequest $request)
@@ -80,9 +120,10 @@ class ExpensesController extends Controller
     private function updateExpense(ExpenseFormRequest $request, Expenses $expense)
     {
         $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
-        $expense->descriptions = $request->descriptions;
-        $expense->price = $request->price;
-        $expense->expense_date = $expenseDate->format('Y-m-d');
-        $expense->save();
+        $expense->update([
+            'descriptions' => $request->descriptions,
+            'price' => $request->price,
+            'expense_date' => $expenseDate->format('Y-m-d'),
+        ]);
     }
 }
