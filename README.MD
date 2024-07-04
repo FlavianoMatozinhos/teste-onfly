@@ -137,7 +137,7 @@ OBS(Irá aparecer a opção de criar migrations, digitar YES /  Irá aparecer a 
     ```
 
 ## USO
-- Acessando a tela principal, você será redirecionado para a tela de Login, se você já tenha usuario cadastrado, basta informar email e senha.
+- Acessando a tela principal, você será redirecionado para a tela de Login, basta informar email e senha.
 ![login](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/19f90a0c-3d69-431a-bb1c-fcf5d4aeb585)
 
 
