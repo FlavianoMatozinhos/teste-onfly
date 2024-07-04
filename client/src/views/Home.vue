@@ -30,8 +30,8 @@
     <div v-else>
       <p class="text-center">Você não possui despesas cadastradas.</p>
     </div>
-    <div v-if="error" class="alert alert-danger text-center mt-4">
-      <p>{{ errorMessage }}</p>
+    <div v-if="alertMessage" :class="['alert', alertType === 'error' ? 'alert-danger' : 'alert-success']">
+      <p>{{ alertMessage }}</p>
     </div>
 
     <expense-edit-modal
@@ -56,7 +56,9 @@ export default {
       error: false,
       errorMessage: '',
       showModal: false,
-      selectedExpense: null
+      selectedExpense: null,
+      alertMessage: '',
+      alertType: ''
     };
   },
   created() {
@@ -94,9 +96,13 @@ export default {
         }
         await this.loadExpenses();
         this.closeModal();
-        alert('Despesa atualizada com sucesso.');
+        this.alertMessage = 'Despesa atualizada com sucesso!';
+        this.alertType = 'success';
+        this.setAutoCloseAlert();
       } catch (error) {
-        alert('Erro ao atualizar despesa. Por favor, tente novamente mais tarde.');
+        this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
+        this.alertType = 'error';
+        this.setAutoCloseAlert();
       }
     },
     async confirmDelete(expenseId) {
@@ -104,15 +110,24 @@ export default {
         try {
           await this.$http.delete(`/expenses/${expenseId}`);
           this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
-          alert('Despesa excluída com sucesso.');
+          this.alertMessage = 'Despesa excluída com sucesso!';
+          this.alertType = 'success';
+          this.setAutoCloseAlert();
         } catch (error) {
-          alert('Erro ao excluir despesa. Por favor, tente novamente mais tarde.');
+          this.alertMessage = 'Erro ao excluir despesa. Por favor, tente novamente mais tarde.';
+          this.alertType = 'error';
+          this.setAutoCloseAlert();
         }
       }
     },
     closeModal() {
       this.showModal = false;
       this.selectedExpense = null;
+    },
+    setAutoCloseAlert() {
+      setTimeout(() => {
+        this.alertMessage = '';
+      }, 3000);
     }
   }
 };
@@ -136,5 +151,17 @@ th, td {
 
 .alert {
   margin-top: 20px;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
 }
 </style>

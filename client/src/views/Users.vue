@@ -77,20 +77,21 @@ export default {
       }
     },
     async updateUser() {
-    try {
-        const response = await this.$http.put(`/users/${this.editingUser.id}`, this.formData);
+      try {
+        const response = await axios.put(`/users/${this.editingUser.id}`, this.formData);
         const updatedUser = response.data;
         const index = this.users.findIndex(user => user.id === updatedUser.id);
         if (index !== -1) {
-            this.users.splice(index, 1, updatedUser);
+          this.users.splice(index, 1, updatedUser);
         }
         this.resetForm();
         this.alertMessage = 'Usuário atualizado com sucesso!';
         this.alertType = 'success';
-    } catch (error) {
+        window.location.reload();
+      } catch (error) {
         this.handleFormError(error);
-    }
-},
+      }
+    },
     async deleteUser(userId) {
       try {
         await axios.delete(`/users/${userId}`);

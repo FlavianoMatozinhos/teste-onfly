@@ -12,9 +12,9 @@
               <label for="descriptions">Descrição:</label>
               <input type="text" id="descriptions" class="form-control" v-model="editedExpense.descriptions" required>
             </div>
-            <div class="form-group mb-3">
+            <div class="form-group  mb-3">
               <label for="price">Preço:</label>
-              <input type="text" id="price" class="form-control" v-model="editedExpense.price" v-money="money" @input="clearPriceErrors" @keypress="preventNegativeInput" required>
+              <input type="text" id="price" class="form-control" v-model="editedExpense.price" v-money="money" @input="clearPriceErrors" required>
               <span v-if="parseFloat(editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0" class="error-message">O preço não pode ser negativo.</span>
             </div>
             <div class="form-group mb-3">
@@ -23,6 +23,9 @@
             </div>
             <button type="submit" class="btn btn-primary btn-block">Salvar</button>
           </form>
+        </div>
+        <div v-if="alertMessage" :class="['alert', alertType === 'error' ? 'alert-danger' : 'alert-success']">
+          <p>{{ alertMessage }}</p>
         </div>
       </div>
     </div>
@@ -55,7 +58,9 @@ export default {
         suffix: '',
         precision: 2,
         masked: true
-      }
+      },
+      alertMessage: '',
+      alertType: ''
     };
   },
   watch: {
@@ -68,6 +73,13 @@ export default {
     },
     selectedDate(newVal) {
       this.editedExpense.expense_date = moment(newVal, 'DD/MM/YYYY').format('DD/MM/YYYY');
+    },
+    alertMessage(newValue) {
+      if (newValue) {
+        setTimeout(() => {
+          this.alertMessage = '';
+        }, 3000);
+      }
     }
   },
   methods: {
@@ -79,7 +91,8 @@ export default {
       try {
         const price = parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.'));
         if (isNaN(price) || price < 0) {
-          this.errorMessage = 'Por favor, insira um preço válido.';
+          this.alertMessage = 'Por favor, insira um preço válido.';
+          this.alertType = 'error';
           return;
         }
 
@@ -91,19 +104,16 @@ export default {
 
         this.$emit('update', response.data);
         this.closeModal();
-        alert('Despesa atualizada com sucesso.');
+        this.alertMessage = 'Despesa atualizada com sucesso.';
+        this.alertType = 'success';
       } catch (error) {
-        alert('Erro ao atualizar despesa. Por favor, tente novamente mais tarde.');
+        this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
+        this.alertType = 'error';
       }
     },
     clearPriceErrors() {
       if (parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0) {
         this.editedExpense.price = '';
-      }
-    },
-    preventNegativeInput(event) {
-      if (event.key === '-' || event.key === '+') {
-        event.preventDefault();
       }
     },
     disabledDates(date) {
@@ -176,5 +186,22 @@ label {
   color: #dc3545;
   font-size: 0.875rem;
   margin-top: 0.25rem;
+}
+
+.alert {
+  margin-top: 10px;
+  transition: opacity 0.5s ease;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
 }
 </style>
