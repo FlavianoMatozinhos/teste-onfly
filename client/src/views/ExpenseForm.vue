@@ -2,22 +2,22 @@
   <div class="expense-form">
     <h2>Cadastrar Despesa</h2>
     <form @submit.prevent="submitExpense">
-      <div>
+      <div class="form-group">
         <label for="descriptions">Descrição:</label>
         <input type="text" id="descriptions" v-model="form.descriptions" maxlength="191" required>
         <span v-if="form.descriptions.length > 191" class="error-message">A descrição não pode ter mais de 191 caracteres.</span>
       </div>
-      <div>
+      <div class="form-group">
         <label for="price">Preço:</label>
         <input type="text" id="price" v-model="form.price" v-money="money" @input="clearPriceErrors" required>
         <span v-if="form.price < 0" class="error-message">O preço não pode ser negativo.</span>
       </div>
-      <div>
+      <div class="form-group">
         <label for="expense_date">Data da Despesa:</label>
-        <DatePicker v-model="form.expense_date" type="date" :disabled-date="disabledDates"></DatePicker>
+        <DatePicker v-model="form.expense_date" type="date" :disabled-date="disabledDates" class="form-control"></DatePicker>
       </div>
-      <div>
-        <button type="submit">Cadastrar Despesa</button>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-block">Cadastrar Despesa</button>
       </div>
     </form>
 
@@ -48,7 +48,7 @@ export default {
         expense_date: ''
       },
       errorMessage: '',
-      successMessage: '', // Adicionando estado para sucesso
+      successMessage: '',
       money: {
         decimal: ',',
         thousands: '.',
@@ -79,12 +79,12 @@ export default {
 
       try {
         // Format the date before sending it to the server
-        this.form.expense_date = moment(this.form.expense_date).format('DD/MM/YYYY');
+        this.form.expense_date = moment(this.form.expense_date).format('YYYY-MM-DD');
 
         const response = await this.$http.post('/expenses', { ...this.form, price });
         console.log('Expense added:', response.data);
         this.$emit('expense-added', response.data.data);
-        this.successMessage = 'Despesa cadastrada com sucesso!'; // Mostra o alerta de sucesso
+        this.successMessage = 'Despesa cadastrada com sucesso!';
         this.resetForm();
       } catch (error) {
         this.errorMessage = 'Erro ao cadastrar despesa.';
@@ -112,30 +112,57 @@ export default {
 <style scoped>
 .expense-form {
   max-width: 400px;
-  margin: auto;
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
 }
-.expense-form form {
-  display: flex;
-  flex-direction: column;
+
+.expense-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
-.expense-form form div {
-  margin-bottom: 1rem;
+
+.form-group {
+  margin-bottom: 15px;
 }
-.expense-form form label {
+
+.form-group label {
+  display: block;
   font-weight: bold;
+  margin-bottom: 5px;
 }
-.expense-form form input {
-  padding: 0.5rem;
+
+.form-group input,
+.form-group .form-control {
+  width: 100%;
+  padding: 8px;
   font-size: 1rem;
   border: 1px solid #ccc;
+  border-radius: 4px;
 }
-.expense-form form button {
-  padding: 0.75rem;
+
+.form-group .form-control {
+  padding: 0.5rem;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
   font-size: 1rem;
+  color: #fff;
   background-color: #007bff;
-  color: white;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: #0056b3;
 }
 
 .error-message {
@@ -145,9 +172,11 @@ export default {
 }
 
 .alert {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 0.25rem;
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-align: center;
 }
 
 .alert-danger {

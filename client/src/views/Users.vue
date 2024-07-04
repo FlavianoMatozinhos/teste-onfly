@@ -5,12 +5,15 @@
     <form @submit.prevent="editingUser ? updateUser() : createUser()">
       <input v-model="formData.name" type="text" placeholder="Nome" required>
       <input v-model="formData.email" type="email" placeholder="Email" required>
-      <input v-model="formData.password" type="password" placeholder="Senha" required>
+      <input v-model="formData.password" type="password" placeholder="Senha" :required="!editingUser">
 
-      <button type="submit">{{ editingUser ? 'Atualizar' : 'Criar' }} Usuário</button>
+      <div class="buttons">
+        <button type="submit">{{ editingUser ? 'Atualizar' : 'Criar' }} Usuário</button>
+        <button v-if="editingUser" type="button" @click="resetForm">Voltar</button>
+      </div>
     </form>
 
-    <table>
+    <table v-if="!editingUser" class="compact-table">
       <thead>
         <tr>
           <th>Nome</th>
@@ -36,7 +39,6 @@
   </div>
 </template>
 
-  
 <script>
 export default {
   data() {
@@ -69,18 +71,7 @@ export default {
         this.alertMessage = 'Usuário criado com sucesso!';
         this.alertType = 'success';
       } catch (error) {
-        if (error.response && error.response.status === 422 && error.response.data.errors) {
-          if (error.response.data.errors.password) {
-            this.alertMessage = 'Erro ao criar usuário: ' + error.response.data.errors.password[0];
-          } else if (error.response.data.errors.email) {
-            this.alertMessage = 'Erro ao criar usuário: ' + error.response.data.errors.email[0];
-          } else {
-            this.alertMessage = 'Erro ao criar usuário.';
-          }
-        } else {
-          this.alertMessage = 'Erro ao criar usuário.';
-        }
-        this.alertType = 'error';
+        this.handleFormError(error);
       }
     },
     async updateUser() {
@@ -94,18 +85,7 @@ export default {
         this.alertMessage = 'Usuário atualizado com sucesso!';
         this.alertType = 'success';
       } catch (error) {
-        if (error.response && error.response.status === 422 && error.response.data.errors) {
-          if (error.response.data.errors.password) {
-            this.alertMessage = 'Erro ao atualizar usuário: ' + error.response.data.errors.password[0];
-          } else if (error.response.data.errors.email) {
-            this.alertMessage = 'Erro ao atualizar usuário: ' + error.response.data.errors.email[0];
-          } else {
-            this.alertMessage = 'Erro ao atualizar usuário.';
-          }
-        } else {
-          this.alertMessage = 'Erro ao atualizar usuário.';
-        }
-        this.alertType = 'error';
+        this.handleFormError(error);
       }
     },
     async deleteUser(userId) {
@@ -132,19 +112,74 @@ export default {
     resetForm() {
       this.formData = { name: '', email: '', password: '' };
       this.editingUser = null;
+    },
+    handleFormError(error) {
+      if (error.response && error.response.status === 422 && error.response.data.errors) {
+        if (error.response.data.errors.password) {
+          this.alertMessage = 'Erro ao processar usuário: ' + error.response.data.errors.password[0];
+        } else if (error.response.data.errors.email) {
+          this.alertMessage = 'Erro ao processar usuário: ' + error.response.data.errors.email[0];
+        } else {
+          this.alertMessage = 'Erro ao processar usuário.';
+        }
+      } else {
+        this.alertMessage = 'Erro ao processar usuário.';
+      }
+      this.alertType = 'error';
     }
   }
 };
 </script>
-  
+
 <style scoped>
 .users {
   text-align: center;
   margin-top: 20px;
 }
 
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  width: 80%;
+  max-width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.buttons button {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.buttons button:first-of-type {
+  background-color: #007bff;
+  color: white;
+}
+
+.buttons button:last-of-type {
+  background-color: #6c757d;
+  color: white;
+}
+
 table {
-  width: 100%;
+  width: 80%;
+  margin: auto;
   border-collapse: collapse;
   margin-top: 20px;
 }
@@ -152,6 +187,7 @@ table {
 th, td {
   border: 1px solid #ddd;
   padding: 8px;
+  text-align: center;
 }
 
 th {

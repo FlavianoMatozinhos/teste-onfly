@@ -1,13 +1,13 @@
 <template>
-  <div class="home">
-    <h2>Home</h2>
-    <div>
-      <button @click="goToUsers">Gerenciar Usuários</button>
-      <button @click="goToCreateExpense">Cadastrar Despesa</button>
+  <div class="home container">
+    <h2 class="text-center my-4">Home</h2>
+    <div class="d-flex justify-content-center mb-5">
+      <button class="btn btn-primary mx-2" @click="goToUsers">Gerenciar Usuários</button>
+      <button class="btn btn-success mx-2" @click="goToCreateExpense">Cadastrar Despesa</button>
     </div>
     <div v-if="expenses.length">
-      <h3>Suas Despesas</h3>
-      <table>
+      <h3 class="text-center mb-4 mt-4">Suas Despesas</h3>
+      <table class="table table-striped table-hover">
         <thead>
           <tr>
             <th>Descrição</th>
@@ -20,17 +20,17 @@
             <td>{{ expense.descriptions }}</td>
             <td>{{ expense.price }}</td>
             <td>
-              <button @click="editExpense(expense)">Editar</button>
-              <button @click="confirmDelete(expense.id)">Excluir</button>
+              <button class="btn btn-warning btn-sm mx-1" @click="editExpense(expense)">Editar</button>
+              <button class="btn btn-danger btn-sm mx-1" @click="confirmDelete(expense.id)">Excluir</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
     <div v-else>
-      <p>Você não possui despesas cadastradas.</p>
+      <p class="text-center">Você não possui despesas cadastradas.</p>
     </div>
-    <div v-if="error">
+    <div v-if="error" class="alert alert-danger text-center mt-4">
       <p>{{ errorMessage }}</p>
     </div>
 
@@ -125,22 +125,21 @@ export default {
 
 <style scoped>
 .home {
-  text-align: center;
-  margin-top: 20px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
 }
 
 th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  text-align: center;
 }
 
-th {
-  background-color: #f2f2f2;
+.alert {
+  margin-top: 20px;
 }
 </style>
