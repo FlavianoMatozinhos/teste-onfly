@@ -34,38 +34,46 @@ Certifique-se de ter as seguintes ferramentas instaladas em seu sistema:
 
 
 3. **Instalação das Dependências**
-- composer install
-- npm install
-- npm install axios
+- composer install (No arquivo BackEnd - api)
+- npm install (No arquivo FrontEnd - client)
+- npm install axios (No arquivo FrontEnd - client)
 
 
 4. **Geração da Chave de Aplicação**
-- php artisan key:generate
+- php artisan key:generate - (No arquivo BackEnd - api)
 
 
 5. **Migração do Banco de Dados**
-- php artisan migrate
+- php artisan migrate - (No arquivo BackEnd - api)
 
 
 6. **Instalação do Passport**
-- composer require laravel/passport
+- composer require laravel/passport - (No arquivo BackEnd - api)
 
 
-6. **Instalação do Sanctum**
-- composer require laravel/sanctum
+7. **Instalação do Passport pt2**
+- php artisan passport:install - OBS(Irá aparecer a opção de criar migrations, digitar YES /  Irá aparecer a opção de Criar KEYS para o Client, digitar YES) - (No arquivo BackEnd - api)
 
 
-7. **Instalação do Swagger**
-- composer require darkaonline/l5-swagger
-- php artisan l5-swagger:generate
+8. **Instalação do Sanctum**
+- composer require laravel/sanctum - (No arquivo BackEnd - api)
 
 
-8. **Execução do Worker de Filas**
-- php artisan queue:work --queue=default
+9. **Instalação do Swagger**
+- composer require darkaonline/l5-swagger - (No arquivo BackEnd - api)
+- php artisan l5-swagger:generate - (No arquivo BackEnd - api)
 
 
-9. **Compilação dos Assets (para projetos Vue.js)**
-- npm run serve ou npm run dev
+10. **Execução do Worker de Filas**
+- php artisan queue:work --queue=default - (No arquivo BackEnd - api)
+
+
+11. **Compilação dos Assets (para projetos Vue.js)**
+- npm run serve ou npm run dev - (No arquivo FrontEnd - client)
+
+
+12. **Execução dos testes**
+- php artisan test - (No arquivo BackEnd - api)
 
 
 ## USO
