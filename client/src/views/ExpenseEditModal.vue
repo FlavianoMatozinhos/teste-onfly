@@ -12,9 +12,9 @@
               <label for="descriptions">Descrição:</label>
               <input type="text" id="descriptions" class="form-control" v-model="editedExpense.descriptions" required>
             </div>
-            <div class="form-group  mb-3">
+            <div class="form-group mb-3">
               <label for="price">Preço:</label>
-              <input type="text" id="price" class="form-control" v-model="editedExpense.price" v-money="money" @input="clearPriceErrors" required>
+              <input type="text" id="price" class="form-control" v-model="editedExpense.price" v-money="money" @input="clearPriceErrors" @keypress="preventNegativeInput" required>
               <span v-if="parseFloat(editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0" class="error-message">O preço não pode ser negativo.</span>
             </div>
             <div class="form-group mb-3">
@@ -79,7 +79,7 @@ export default {
       try {
         const price = parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.'));
         if (isNaN(price) || price < 0) {
-          alert('Por favor, insira um preço válido.');
+          this.errorMessage = 'Por favor, insira um preço válido.';
           return;
         }
 
@@ -99,6 +99,11 @@ export default {
     clearPriceErrors() {
       if (parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0) {
         this.editedExpense.price = '';
+      }
+    },
+    preventNegativeInput(event) {
+      if (event.key === '-' || event.key === '+') {
+        event.preventDefault();
       }
     },
     disabledDates(date) {

@@ -47,17 +47,14 @@
           this.alertType = 'alert-danger';
           return;
         }
-  
         try {
-          const response = await axios.post('http://localhost:8000/api/register', this.form);
-          console.log('Registered successfully:', response.data);
+          await axios.post('http://localhost:8000/api/register', this.form);
           this.alertMessage = 'Registrado com sucesso!';
           this.alertType = 'alert-success';
           setTimeout(() => {
             this.$router.push({ name: 'Login' });
           }, 2000);
         } catch (error) {
-          console.log(error.response);
           if (error.response.status === 500) {
             this.alertMessage = 'Email já cadastrado.';
           } else {

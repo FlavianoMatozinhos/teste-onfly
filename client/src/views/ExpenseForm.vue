@@ -9,8 +9,8 @@
       </div>
       <div class="form-group">
         <label for="price">Preço:</label>
-        <input type="text" id="price" v-model="form.price" v-money="money" @input="clearPriceErrors" required>
-        <span v-if="form.price < 0" class="error-message">O preço não pode ser negativo.</span>
+        <input type="text" id="price" v-model="form.price" v-money="money" @input="clearPriceErrors" @keypress="preventNegativeInput" required>
+        <span v-if="parseFloat(form.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0" class="error-message">O preço não pode ser negativo.</span>
       </div>
       <div class="form-group">
         <label for="expense_date">Data da Despesa:</label>
@@ -86,7 +86,7 @@ export default {
       }
     },
     clearPriceErrors() {
-      if (this.form.price < 0) {
+      if (parseFloat(this.form.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0) {
         this.form.price = '';
       }
       this.errorMessage = '';
@@ -98,6 +98,11 @@ export default {
       this.form.descriptions = '';
       this.form.price = '';
       this.form.expense_date = '';
+    },
+    preventNegativeInput(event) {
+      if (event.key === '-' || event.key === '+') {
+        event.preventDefault();
+      }
     }
   }
 };
