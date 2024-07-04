@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendExpenseCreatedEmail;
 use App\Models\Expenses;
 use App\Notifications\ExpenseCreatedNotification;
 use Illuminate\Http\Request;
@@ -54,7 +55,7 @@ class ExpensesController extends Controller
             'expense_date' => $expenseDate->format('Y-m-d'),
         ]);
 
-        $user->notify(new ExpenseCreatedNotification($expense));
+        SendExpenseCreatedEmail::dispatch($expense);
 
         $response = [
             'status' => 'success',

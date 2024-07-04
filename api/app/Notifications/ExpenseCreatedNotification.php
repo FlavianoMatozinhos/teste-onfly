@@ -28,7 +28,6 @@ class ExpenseCreatedNotification extends Notification
         return (new MailMessage)
             ->subject('Despesa Cadastrada')
             ->line('Sua despesa foi cadastrada com sucesso.')
-            ->action('Ver Despesa', url('/'))
             ->line('Obrigado por usar nossa aplicação!')
         ;
     }
