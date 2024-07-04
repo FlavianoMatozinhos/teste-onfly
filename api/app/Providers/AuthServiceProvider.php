@@ -12,7 +12,6 @@ use App\Policies\UserPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
-
     protected $policies = [
         Expenses::class => ExpensePolicy::class,
         User::class => UserPolicy::class,

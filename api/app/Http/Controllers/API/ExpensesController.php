@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Expenses;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ExpenseResource;
 use App\Http\Requests\ExpenseFormRequest;
 use App\Jobs\SendExpenseCreatedEmail;
+use Illuminate\Foundation\Mix;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 
 class ExpensesController extends Controller
 {
@@ -45,7 +46,7 @@ class ExpensesController extends Controller
      *     ),
      * )
      */
-    public function index()
+    public function index(): mixed
     {
         try {
             $this->authorize('viewAny', Expenses::class);
@@ -70,27 +71,27 @@ class ExpensesController extends Controller
         }
     }
 
-/**
- * @OA\Post(
- *     path="/expenses",
- *     summary="Create a new expense",
- *     tags={"Expenses"},
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(ref="#/components/schemas/ExpenseFormRequest")
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Failed to create expense",
- *         @OA\JsonContent(
- *             @OA\Property(property="status", type="string", example="error"),
- *             @OA\Property(property="message", type="string", example="Failed to create expense!")
- *         )
- *     )
- * )
- */
-    public function store(ExpenseFormRequest $request)
+    /**
+     * @OA\Post(
+     *     path="/expenses",
+     *     summary="Create a new expense",
+     *     tags={"Expenses"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/ExpenseFormRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Failed to create expense",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Failed to create expense!")
+     *         )
+     *     )
+     * )
+    */
+    public function store(ExpenseFormRequest $request): mixed
     {
         try {
             $this->authorize('create', Expenses::class);
@@ -152,8 +153,8 @@ class ExpensesController extends Controller
      *         ),
      *     ),
      * )
-     */
-    public function show(Expenses $expense)
+    */
+    public function show(Expenses $expense): mixed
     {
         try {
             $this->authorize('view', $expense);
@@ -210,11 +211,12 @@ class ExpensesController extends Controller
      *         ),
      *     ),
      * )
-     */
-    public function update(ExpenseFormRequest $request, Expenses $expense)
+    */
+    public function update(ExpenseFormRequest $request, Expenses $expense): mixed
     {
         try {
             $this->authorize('update', $expense);
+
             $this->updateExpense($request, $expense);
 
             return new ExpenseResource($expense);
@@ -273,8 +275,8 @@ class ExpensesController extends Controller
      *         ),
      *     ),
      * )
-     */
-    public function destroy(Expenses $expense)
+    */
+    public function destroy(Expenses $expense): JsonResponse
     {
         try {
             $this->authorize('delete', $expense);
@@ -294,7 +296,7 @@ class ExpensesController extends Controller
         }
     }
 
-    private function createExpense(ExpenseFormRequest $request)
+    private function createExpense(ExpenseFormRequest $request): ?Expenses
     {
         $user = auth()->user();
         $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
@@ -306,9 +308,10 @@ class ExpensesController extends Controller
         ]);
     }
 
-    private function updateExpense(ExpenseFormRequest $request, Expenses $expense)
+    private function updateExpense(ExpenseFormRequest $request, Expenses $expense): void
     {
         $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
+
         $expense->update([
             'descriptions' => $request->descriptions,
             'price' => $request->price,

@@ -12,9 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     @OA\Property(property="price", type="number", format="float", example=100.50),
  *     @OA\Property(property="expense_date", type="string", format="date", example="2024-07-05"),
  * )
- */
-
-
+*/
 class ExpenseFormRequest extends FormRequest
 {
     public function authorize()
@@ -25,7 +23,7 @@ class ExpenseFormRequest extends FormRequest
     public function rules()
     {
         return [
-            'descriptions' => 'required|string|max:250',
+            'descriptions' => 'required|string|max:191',
             'price' => 'required|numeric',
             'expense_date' => 'required|date_format:d/m/Y',
         ];

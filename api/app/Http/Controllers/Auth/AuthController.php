@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterFormRequest;
 use App\Http\Requests\LoginFormRequest;
+use Illuminate\Http\JsonResponse;
 
 /**
  * @OA\Tag(
@@ -15,7 +16,6 @@ use App\Http\Requests\LoginFormRequest;
  *     description="APIs for user authentication"
  * )
  */
-
 class AuthController extends Controller
 {
     /**
@@ -55,8 +55,8 @@ class AuthController extends Controller
      *
      * @param RegisterFormRequest $request
      * @return \Illuminate\Http\JsonResponse
-     */
-    public function register(RegisterFormRequest $request)
+    */
+    public function register(RegisterFormRequest $request): JsonResponse
     {
         $user = $this->createUser($request);
 
@@ -112,8 +112,8 @@ class AuthController extends Controller
      *
      * @param LoginFormRequest $request
      * @return \Illuminate\Http\JsonResponse
-     */
-    public function login(LoginFormRequest $request)
+    */
+    public function login(LoginFormRequest $request): JsonResponse
     {
         $user = $this->attemptLogin($request);
 
@@ -171,8 +171,8 @@ class AuthController extends Controller
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     */
-    public function logout(Request $request)
+    */
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->token()->revoke();
 
@@ -187,8 +187,8 @@ class AuthController extends Controller
      *
      * @param RegisterFormRequest $request
      * @return User
-     */
-    private function createUser(RegisterFormRequest $request)
+    */
+    private function createUser(RegisterFormRequest $request): array
     {
         return User::create([
             'name' => $request->name,
@@ -202,8 +202,8 @@ class AuthController extends Controller
      *
      * @param LoginFormRequest $request
      * @return User|null
-     */
-    private function attemptLogin(LoginFormRequest $request)
+    */
+    private function attemptLogin(LoginFormRequest $request): mixed
     {
         $user = User::where('email', $request->email)->first();
 

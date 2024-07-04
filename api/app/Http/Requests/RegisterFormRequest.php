@@ -12,8 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     @OA\Property(property="email", type="string", format="email", example="john@example.com"),
  *     @OA\Property(property="password", type="string", format="password", example="Password123"),
  * )
- */
-
+*/
 class RegisterFormRequest extends FormRequest
 {
     public function authorize()

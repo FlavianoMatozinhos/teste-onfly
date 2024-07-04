@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\UserFormRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * @OA\Tag(
@@ -18,22 +19,22 @@ use Illuminate\Http\JsonResponse;
  */
 class UserController extends Controller
 {
-/**
- * @OA\Get(
- *     path="/api/users",
- *     summary="Get all users",
- *     tags={"Users"},
- *     @OA\Response(
- *         response=200,
- *         description="List of users",
- *         @OA\JsonContent(
- *             type="array",
- *             @OA\Items(ref="#/components/schemas/UserResource")
- *         )
- *     )
- * )
- */
-    public function index()
+    /**
+     * @OA\Get(
+     *     path="/api/users",
+     *     summary="Get all users",
+     *     tags={"Users"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of users",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/UserResource")
+     *         )
+     *     )
+     * )
+    */
+    public function index(): AnonymousResourceCollection
     {
         $users = User::all();
         return UserResource::collection($users);
@@ -57,8 +58,8 @@ class UserController extends Controller
      * )
      * @param UserFormRequest $request
      * @return UserResource
-     */
-    public function store(UserFormRequest $request)
+    */
+    public function store(UserFormRequest $request): mixed
     {
         $user = $this->createUser($request);
         return new UserResource($user);
@@ -86,8 +87,8 @@ class UserController extends Controller
      * )
      * @param User $user
      * @return UserResource
-     */
-    public function show(User $user)
+    */
+    public function show(User $user): mixed
     {
         $this->authorize('view', $user);
         return new UserResource($user);
@@ -121,8 +122,8 @@ class UserController extends Controller
      * @param Request $request
      * @param User $user
      * @return UserResource
-     */
-    public function update(Request $request, User $user)
+    */
+    public function update(Request $request, User $user): mixed
     {
         $this->updateUser($request, $user);
         return new UserResource($user);
@@ -149,8 +150,8 @@ class UserController extends Controller
      * )
      * @param User $user
      * @return JsonResponse
-     */
-    public function destroy(User $user)
+    */
+    public function destroy(User $user): JsonResponse
     {
         $user->delete();
         return response()->json(null, 204);
@@ -161,7 +162,7 @@ class UserController extends Controller
      *
      * @param UserFormRequest $request
      * @return User
-     */
+    */
     private function createUser(UserFormRequest $request)
     {
         return User::create([
@@ -177,7 +178,7 @@ class UserController extends Controller
      * @param Request $request
      * @param User $user
      * @return void
-     */
+    */
     private function updateUser(Request $request, User $user)
     {
         $user->update([
