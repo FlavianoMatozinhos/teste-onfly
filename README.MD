@@ -138,54 +138,54 @@ OBS(Irá aparecer a opção de criar migrations, digitar YES /  Irá aparecer a 
 
 ## USO
 - Acessando a tela principal, você será redirecionado para a tela de Login, se você já tenha usuario cadastrado, basta informar email e senha.
-- ![login](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/19f90a0c-3d69-431a-bb1c-fcf5d4aeb585)
+![login](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/19f90a0c-3d69-431a-bb1c-fcf5d4aeb585)
 
 
 - Caso não tenha usuario cadastro, ir através da barra de navegação e clicar em Register, e assim que criar o usuario, será redirecionado para a tela de login.
-- ![register](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/1e78b24b-ce6e-4ca6-ac86-41c8a711b6e2)
+![register](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/1e78b24b-ce6e-4ca6-ac86-41c8a711b6e2)
 
 
 - Após feito login, será redirecionado para a pagina de Home, que só é acessivel através do Login.
-- ![home s-despesa](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/7482560b-0f42-4347-a3b8-8ab48c012168)
+![home s-despesa](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/7482560b-0f42-4347-a3b8-8ab48c012168)
 
 
 - Na tela de home você terá acesso ao gerenciador dos usuarios e cadastrar alguma despesa.
-- ![despesa-usuarios](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/23bbfc75-f8da-4ca2-af69-bb07de802abf)
+![despesa-usuarios](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/23bbfc75-f8da-4ca2-af69-bb07de802abf)
 
 - Acessando a guia de Gerenciar Usuarios, você terá acesso aos usuarios cadastrados ao seu sistema, sendo possivel criar, editar e excluir um usuario.
-- ![usuario-1](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/42c750e7-f840-4bf3-9edd-b07d858a65f6)
+![usuario-1](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/42c750e7-f840-4bf3-9edd-b07d858a65f6)
 
 
 - Clicando em Editar um usuario, você terá acesso a um formulario de edição.
-- ![edit-usuario-2](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/97f90c06-0b93-4ae4-a76f-f03f06601f11)
+![edit-usuario-2](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/97f90c06-0b93-4ae4-a76f-f03f06601f11)
 
 
 - Clicando em Excluir um usuario, aparecerá um alerta perguntando se deseja mesmo fazer essa exclusão.
-- ![excluir-usuario-3](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/70b86318-acdb-4104-863a-98d68f11f1b4)
+![excluir-usuario-3](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/70b86318-acdb-4104-863a-98d68f11f1b4)
 
 
 - Para voltar a tela de Home, basta seguir a barra de navegação e clicar em Home.
-- ![Home-logout](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/8b6d16e8-4aa0-40ca-8cc2-81fe51195c0f)
+![Home-logout](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/8b6d16e8-4aa0-40ca-8cc2-81fe51195c0f)
 
 
 - Acessando a tela de Home novamente e indo em Cadastrar Despesa, você terá acesso a está tela.
-- ![despesa-1](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/6e326865-e104-49fa-847f-e481cb188d22)
+![despesa-1](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/6e326865-e104-49fa-847f-e481cb188d22)
 
 
 - Para cadastrar uma despesa você precisa de uma descrição, o valor e a data que ocorreu a despesa. Obs(O valor não pode ser negativo e a data não poderá ser futura).
-- ![data-despesa](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/fa490a69-d500-4a22-9c35-b91a7ef13108)
+![data-despesa](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/fa490a69-d500-4a22-9c35-b91a7ef13108)
 
 
 - Cadastrando a Despesa, será possivel visualizar a mesma na tela de Home.
-- ![home-c-despesa](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/de8349dd-7c55-454a-843c-afa339315fb6)
+![home-c-despesa](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/de8349dd-7c55-454a-843c-afa339315fb6)
 
 
 - Na tela de home é possivel excluir e editar a despesa cadastrada. 
-- ![edit-despesa-2](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/1676322a-8438-4a1c-a39d-0d8ee4d2e7ec)
+![edit-despesa-2](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/1676322a-8438-4a1c-a39d-0d8ee4d2e7ec)
 
 
 - Clicando em Excluir despesa, aparecerá um alerta perguntando se deseja mesmo excluir.
-- ![excluir-despesa-3](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/a9d037f1-926c-4521-ae2d-a790952a5775)
+![excluir-despesa-3](https://github.com/FlavianoMatozinhos/teste-onfly/assets/56773752/a9d037f1-926c-4521-ae2d-a790952a5775)
 
 
 - Para fazer Logout, basta clicar na barra de navegação "Logout"
