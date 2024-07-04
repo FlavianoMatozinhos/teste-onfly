@@ -2,32 +2,30 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Jobs\SendExpenseCreatedEmail;
-use App\Models\Expenses;
-use App\Notifications\ExpenseCreatedNotification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
+use App\Models\Expenses;
 
 class ExpensesController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $expenses = Expenses::where('user_id', $user->id)->get();
+        $this->authorize('viewAny', Expenses::class);
+
+        $user = auth()->user();
+        $expenses = $user->expenses()->get();
         
-        if (is_null($expenses->first())) {
+        if ($expenses->isEmpty()) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'No expense found!',
-            ], 200);
+            ], 404);
         }
 
         $response = [
             'status' => 'success',
-            'message' => 'Expenses are retrieved successfully.',
+            'message' => 'Expenses retrieved successfully.',
             'data' => $expenses,
         ];
 
@@ -36,27 +34,22 @@ class ExpensesController extends Controller
 
     public function store(Request $request)
     {
-        $validate = $this->validateExpenseData($request);
+        $this->authorize('create', Expenses::class);
 
-        if ($validate->fails()) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Validation Error!',
-                'data' => $validate->errors(),
-            ], 403);
-        }
+        $request->validate([
+            'descriptions' => 'required|string|max:250',
+            'price' => 'required|numeric',
+            'expense_date' => 'required|date_format:d/m/Y',
+        ]);
 
-        $user = Auth::user();
+        $user = auth()->user();
         $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
 
-        $expense = Expenses::create([
+        $expense = $user->expenses()->create([
             'descriptions' => $request->descriptions,
-            'user_id' => $user->id,
             'price' => $request->price,
             'expense_date' => $expenseDate->format('Y-m-d'),
         ]);
-
-        SendExpenseCreatedEmail::dispatch($expense);
 
         $response = [
             'status' => 'success',
@@ -67,85 +60,31 @@ class ExpensesController extends Controller
         return response()->json($response, 201);
     }
 
-    private function validateExpenseData(Request $request)
+    public function show(Expenses $expense)
     {
-        $validator = Validator::make($request->all(), [
+        $this->authorize('view', $expense);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Expense retrieved successfully.',
+            'data' => $expense,
+        ], 200);
+    }
+
+    public function update(Request $request, Expenses $expense)
+    {
+        $this->authorize('update', $expense);
+
+        $request->validate([
             'descriptions' => 'required|string|max:250',
             'price' => 'required|numeric',
             'expense_date' => 'required|date_format:d/m/Y',
         ]);
 
-        $validator->after(function ($validator) use ($request) {
-            $this->validateExpenseDateIsNotFuture($validator, $request->expense_date);
-        });
-
-        return $validator;
-    }
-
-    private function validateExpenseDateIsNotFuture($validator, $expenseDate)
-    {
-        $parsedDate = Carbon::createFromFormat('d/m/Y', $expenseDate);
-
-        if ($parsedDate->isFuture()) {
-            $validator->errors()->add('expense_date', 'The expense date cannot be in the future.');
-        }
-    }
-
-    public function show($id)
-    {
-        $expense = Expenses::find($id);
-  
-        if (is_null($expense)) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'expense not found!',
-            ], 200);
-        }
-
-        $response = [
-            'status' => 'success',
-            'message' => 'expense retrieved successfully.',
-            'data' => $expense,
-        ];
-        
-        return response()->json($response, 200);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $validate = $this->validateExpenseData($request);
-
-        if ($validate->fails()) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Validation Error!',
-                'data' => $validate->errors(),
-            ], 403);
-        }
-
-        $expense = Expenses::find($id);
-
-        if (is_null($expense)) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Expense not found!',
-            ], 404);
-        }
-
-        $user = Auth::user();
-        if ($expense->user_id !== $user->id) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Expense not found. Unable to update.',
-            ], 403);
-        }
-
         $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
-        $expense->fill([
-            'descriptions' => $request->descriptions,
-            'price' => $request->price,
-            'expense_date' => $expenseDate->format('Y-m-d'),
-        ]);
+        $expense->descriptions = $request->descriptions;
+        $expense->price = $request->price;
+        $expense->expense_date = $expenseDate->format('Y-m-d');
         $expense->save();
 
         $response = [
@@ -157,27 +96,12 @@ class ExpensesController extends Controller
         return response()->json($response, 200);
     }
 
-    public function destroy($id)
+    public function destroy(Expenses $expense)
     {
-        $expense = Expenses::find($id);
-    
-        if (is_null($expense)) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Expense not found.',
-            ], 404);
-        }
-    
-        $user = Auth::user();
-        if ($expense->user_id !== $user->id) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Expense not found. Unable to deleted.',
-            ], 403);
-        }
-    
-        Expenses::destroy($id);
-    
+        $this->authorize('delete', $expense);
+
+        $expense->delete();
+
         return response()->json([
             'status' => 'success',
             'message' => 'Expense deleted successfully.',

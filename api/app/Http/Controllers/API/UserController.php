@@ -11,12 +11,16 @@ class UserController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', User::class);
+        
         $users = User::all();
         return response()->json($users);
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', User::class);
+        
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
@@ -34,11 +38,15 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $this->authorize('view', $user);
+        
         return $user;
     }
 
     public function update(Request $request, $id)
     {
+        $this->authorize('update', User::class);
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
@@ -58,6 +66,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
+        
         $user->delete();
         return response()->json(null, 204);
     }
