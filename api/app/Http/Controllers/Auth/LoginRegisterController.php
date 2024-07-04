@@ -6,37 +6,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\RegisterFormRequest;
+use App\Http\Requests\LoginFormRequest;
 
 class LoginRegisterController extends Controller
 {
-     /**
-     * Register a new user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function register(Request $request)
+    public function register(RegisterFormRequest $request)
     {
-        $validate = Validator::make($request->all(), [
-            'name' => 'required|string|max:250',
-            'email' => 'required|email',
-            'password' => 'required|string|min:8'
-        ]);
-
-        if($validate->fails()){
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Validation Error!',
-                'data' => $validate->errors(),
-            ], 403);
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
+        $user = $this->createUser($request);
 
         $token = $user->createToken('token')->accessToken;
 
@@ -52,41 +29,21 @@ class LoginRegisterController extends Controller
         return response()->json($response, 201);
     }
 
-    /**
-     * Authenticate the user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function login(Request $request)
+    public function login(LoginFormRequest $request)
     {
-        $validate = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string'
-        ]);
+        $user = $this->attemptLogin($request);
 
-        if($validate->fails()){
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Validation Error!',
-                'data' => $validate->errors(),
-            ], 403);  
-        }
-
-        // Check email exist
-        $user = User::where('email', $request->email)->first();
-
-        // Check password
-        if(!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Invalid credentials'
-                ], 401);
+            ], 401);
         }
 
-        $data['token'] = $user->createToken($request->email)->accessToken;
+        $token = $user->createToken($request->email)->accessToken;
+        $data['token'] = $token;
         $data['user'] = $user;
-        
+
         $response = [
             'status' => 'success',
             'message' => 'User is logged in successfully.',
@@ -94,20 +51,35 @@ class LoginRegisterController extends Controller
         ];
 
         return response()->json($response, 200);
-    } 
+    }
 
-    /**
-     * Log out the user from application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
+        $request->user()->token()->revoke();
+
         return response()->json([
             'status' => 'success',
             'message' => 'User is logged out successfully'
-            ], 200);
-    }    
+        ], 200);
+    }
+
+    private function createUser(RegisterFormRequest $request)
+    {
+        return User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+        ]);
+    }
+
+    private function attemptLogin(LoginFormRequest $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && Hash::check($request->password, $user->password)) {
+            return $user;
+        }
+
+        return null;
+    }
 }
