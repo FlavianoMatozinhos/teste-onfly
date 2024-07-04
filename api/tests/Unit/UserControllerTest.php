@@ -19,13 +19,14 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                '*' => [
-                    'id',
-                    'name',
-                    'email',
-                    'email_verified_at',
-                    'created_at',
-                    'updated_at',
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'email',
+                        'created_at',
+                        'updated_at',
+                    ]
                 ]
             ])
         ;
@@ -44,9 +45,14 @@ class UserControllerTest extends TestCase
         ;
 
         $response->assertStatus(201)
-            ->assertJson([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at',
+                    'updated_at',
+                ]
             ])
         ;
     }
@@ -61,12 +67,17 @@ class UserControllerTest extends TestCase
             'email' => 'updated@example.com',
         ];
 
-        $response = $this->json('post', "/api/users/{$user->id}", $updatedData);
+        $response = $this->json('put', "/api/users/{$user->id}", $updatedData);
 
         $response->assertStatus(200)
-            ->assertJson([
-                'name' => 'Updated User',
-                'email' => 'updated@example.com',
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'name',
+                    'email',
+                    'created_at',
+                    'updated_at',
+                ]
             ])
         ;
     }

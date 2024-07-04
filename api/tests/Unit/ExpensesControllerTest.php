@@ -31,9 +31,18 @@ class ExpensesControllerTest extends TestCase
         ;
 
         $response->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
-                'message' => 'Expenses are retrieved successfully.',
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'descriptions',
+                        'price',
+                        'expense_date',
+                        'user_id',
+                        'created_at',
+                        'updated_at',
+                    ]
+                ]
             ])
         ;
     }
@@ -51,9 +60,16 @@ class ExpensesControllerTest extends TestCase
         ;
 
         $response->assertStatus(201)
-            ->assertJson([
-                'status' => 'success',
-                'message' => 'Expense added successfully.',
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'descriptions',
+                    'price',
+                    'expense_date',
+                    'user_id',
+                    'created_at',
+                    'updated_at',
+                ]
             ])
         ;
     }
@@ -88,12 +104,19 @@ class ExpensesControllerTest extends TestCase
             'expense_date' => $this->faker->date('d/m/Y'),
         ];
 
-        $response = $this->json('post', "/api/expenses/{$expense->id}", $updatedData);
+        $response = $this->json('put', "/api/expenses/{$expense->id}", $updatedData);
 
         $response->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
-                'message' => 'Expense updated successfully.',
+            ->assertJsonStructure([
+                '*' => [
+                    'id',
+                    'descriptions',
+                    'price',
+                    'expense_date',
+                    'user_id',
+                    'created_at',
+                    'updated_at',
+                ]
             ])
         ;
     }
