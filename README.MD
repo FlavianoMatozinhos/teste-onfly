@@ -124,3 +124,87 @@ Certifique-se de ter as seguintes ferramentas instaladas em seu sistema:
 
 
 ## CURLS da API
+- post /api/register
+<span> 
+curl --location 'http://127.0.0.1:8000/api/register' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "teste",
+    "email": "teste@gmail.com",
+    "password": "123456789"
+}'
+</span>
+
+
+- post /api/login
+<span> 
+curl --location 'http://localhost:8000/api/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+   "email": "teste@gmail.com",
+    "password": "123456789"
+}'
+</span>
+
+
+- post /api/logout
+<span> 
+curl --location --request POST 'http://localhost:8000/api/logout' \
+--header 'Authorization: Bearer {seu_token}' \
+--header 'Accept: application/json' \
+--data ''
+</span>
+
+
+- get /api/users
+<span> 
+curl --location 'http://localhost:8000/api/users' \
+--header 'Accept: application/json'
+</span>
+
+
+- get /api/expenses
+<span> 
+curl --location 'http://localhost:8000/api/expenses' \
+--header 'Accept: application/json' \
+--header 'Authorization: ••••••' \
+--data ''
+</span>
+
+
+- post /api/expenses
+<span> 
+curl --location 'http://localhost:8000/api/expenses' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: ••••••' \
+--data '{
+    "descriptions": "teste",
+    "price": "12345678",
+    "expense_date": "03/12/2023"
+}'
+</span>
+
+
+- put /api/expenses/{id}
+<span> 
+curl --location --request PUT 'http://localhost:8000/api/expenses/1' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: ••••••' \
+--data '{
+    "descriptions": "teste",
+    "price": "1111",
+    "expense_date": "05/01/2024"
+}'
+</span>
+
+
+- delete /api/expenses/{id}
+<span> 
+curl --location --request DELETE 'http://localhost:8000/api/expenses/1' \
+--header 'Accept: application/json' \
+--header 'Authorization: ••••••' \
+--data ''
+</span>
