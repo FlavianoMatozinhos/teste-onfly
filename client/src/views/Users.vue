@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import axios from '../plugins/axios';
+
 export default {
   data() {
     return {
@@ -56,8 +58,8 @@ export default {
   methods: {
     async loadUsers() {
       try {
-        const response = await this.$http.get('/users');
-        this.users = response.data;
+        const response = await axios.get('/users');
+        this.users = response.data.data;
       } catch (error) {
         this.alertMessage = 'Erro ao carregar usuários.';
         this.alertType = 'error';
@@ -65,8 +67,8 @@ export default {
     },
     async createUser() {
       try {
-        const response = await this.$http.post('/users', this.formData);
-        this.users.push(response.data);
+        const response = await axios.post('/users', this.formData);
+        this.users.push(response.data.data);
         this.resetForm();
         this.alertMessage = 'Usuário criado com sucesso!';
         this.alertType = 'success';
@@ -75,22 +77,23 @@ export default {
       }
     },
     async updateUser() {
-      try {
-        await this.$http.put(`/users/${this.editingUser.id}`, this.formData);
-        const index = this.users.findIndex(user => user.id === this.editingUser.id);
+    try {
+        const response = await this.$http.put(`/users/${this.editingUser.id}`, this.formData);
+        const updatedUser = response.data;
+        const index = this.users.findIndex(user => user.id === updatedUser.id);
         if (index !== -1) {
-          this.users.splice(index, 1, { ...this.formData, id: this.editingUser.id });
+            this.users.splice(index, 1, updatedUser);
         }
         this.resetForm();
         this.alertMessage = 'Usuário atualizado com sucesso!';
         this.alertType = 'success';
-      } catch (error) {
+    } catch (error) {
         this.handleFormError(error);
-      }
-    },
+    }
+},
     async deleteUser(userId) {
       try {
-        await this.$http.delete(`/users/${userId}`);
+        await axios.delete(`/users/${userId}`);
         this.users = this.users.filter(user => user.id !== userId);
         this.alertMessage = 'Usuário excluído com sucesso!';
         this.alertType = 'success';

@@ -12,17 +12,13 @@ use App\Http\Requests\UserFormRequest;
 class UserController extends Controller
 {
     public function index()
-    {
-        $this->authorize('viewAny', User::class);
-        
+    {       
         $users = User::all();
         return UserResource::collection($users);
     }
 
     public function store(UserFormRequest $request)
-    {
-        $this->authorize('create', User::class);
-        
+    {        
         $user = $this->createUser($request);
 
         return new UserResource($user);
@@ -35,19 +31,21 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
-    public function update(UserFormRequest $request, User $user)
+    public function update(Request $request, User $user)
     {
-        $this->authorize('update', $user);
-        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'password' => 'sometimes|required|string|min:8',
+        ]);
+
         $this->updateUser($request, $user);
 
         return new UserResource($user);
     }
 
     public function destroy(User $user)
-    {
-        $this->authorize('delete', $user);
-        
+    {      
         $user->delete();
         return response()->json(null, 204);
     }
@@ -61,7 +59,7 @@ class UserController extends Controller
         ]);
     }
 
-    private function updateUser(UserFormRequest $request, User $user)
+    private function updateUser(Request $request, User $user)
     {
         $user->name = $request->name;
         $user->email = $request->email;

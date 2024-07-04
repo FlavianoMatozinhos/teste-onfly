@@ -7,4 +7,5 @@ php artisan queue:work --queue=default
 
 
 npm install
+npm install axios
 npm run dev
