@@ -23,11 +23,7 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
         
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $user = $this->createUser($request);
 
         return new UserResource($user);
     }
@@ -43,13 +39,8 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
         
-        $user->name = $request->name;
-        $user->email = $request->email;
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-        $user->save();
-    
+        $this->updateUser($request, $user);
+
         return new UserResource($user);
     }
 
@@ -59,5 +50,24 @@ class UserController extends Controller
         
         $user->delete();
         return response()->json(null, 204);
+    }
+
+    private function createUser(UserFormRequest $request)
+    {
+        return User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+    }
+
+    private function updateUser(UserFormRequest $request, User $user)
+    {
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+        $user->save();
     }
 }

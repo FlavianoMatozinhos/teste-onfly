@@ -32,14 +32,7 @@ class ExpensesController extends Controller
     {
         $this->authorize('create', Expenses::class);
 
-        $user = auth()->user();
-        $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
-
-        $expense = $user->expenses()->create([
-            'descriptions' => $request->descriptions,
-            'price' => $request->price,
-            'expense_date' => $expenseDate->format('Y-m-d'),
-        ]);
+        $expense = $this->createExpense($request);
 
         return new ExpenseResource($expense);
     }
@@ -55,11 +48,7 @@ class ExpensesController extends Controller
     {
         $this->authorize('update', $expense);
 
-        $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
-        $expense->descriptions = $request->descriptions;
-        $expense->price = $request->price;
-        $expense->expense_date = $expenseDate->format('Y-m-d');
-        $expense->save();
+        $this->updateExpense($request, $expense);
 
         return new ExpenseResource($expense);
     }
@@ -74,5 +63,26 @@ class ExpensesController extends Controller
             'status' => 'success',
             'message' => 'Expense deleted successfully.',
         ], 200);
+    }
+
+    private function createExpense(ExpenseFormRequest $request)
+    {
+        $user = auth()->user();
+        $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
+
+        return $user->expenses()->create([
+            'descriptions' => $request->descriptions,
+            'price' => $request->price,
+            'expense_date' => $expenseDate->format('Y-m-d'),
+        ]);
+    }
+
+    private function updateExpense(ExpenseFormRequest $request, Expenses $expense)
+    {
+        $expenseDate = Carbon::createFromFormat('d/m/Y', $request->expense_date);
+        $expense->descriptions = $request->descriptions;
+        $expense->price = $request->price;
+        $expense->expense_date = $expenseDate->format('Y-m-d');
+        $expense->save();
     }
 }
