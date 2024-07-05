@@ -15,6 +15,7 @@
           <tr>
             <th>Descrição</th>
             <th>Preço</th>
+            <th>Data da despesa</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -22,6 +23,7 @@
           <tr v-for="expense in paginatedExpenses" :key="expense.id">
             <td>{{ expense.descriptions }}</td>
             <td>{{ expense.price }}</td>
+            <td>{{ formatDate(expense.expense_date) }}</td>
             <td>
               <button class="btn btn-warning btn-sm mx-1" @click="editExpense(expense)">Editar</button>
               <button class="btn btn-danger btn-sm mx-1" @click="confirmDelete(expense.id)">Excluir</button>
@@ -45,104 +47,108 @@
 </template>
 
 <script>
-  import ExpenseEditModal from './ExpenseEditModal.vue';
-  import Pagination from 'vue-pagination-2';
+import ExpenseEditModal from './ExpenseEditModal.vue';
+import Pagination from 'vue-pagination-2';
+import moment from 'moment';
 
-  export default {
-    components: {
-      ExpenseEditModal,
-      Pagination
+export default {
+  components: {
+    ExpenseEditModal,
+    Pagination
+  },
+  data() {
+    return {
+      expenses: [],
+      error: false,
+      errorMessage: '',
+      showModal: false,
+      selectedExpense: null,
+      alertMessage: '',
+      alertType: '',
+      currentPage: 1,
+      perPage: 10
+    };
+  },
+  computed: {
+    paginatedExpenses() {
+      const start = (this.currentPage - 1) * this.perPage;
+      const end = this.currentPage * this.perPage;
+      return this.expenses.slice(start, end);
+    }
+  },
+  created() {
+    this.loadExpenses();
+  },
+  methods: {
+    goToUsers() {
+      this.$router.push('/users');
     },
-    data() {
-      return {
-        expenses: [],
-        error: false,
-        errorMessage: '',
-        showModal: false,
-        selectedExpense: null,
-        alertMessage: '',
-        alertType: '',
-        currentPage: 1,
-        perPage: 10
-      };
+    goToCreateExpense() {
+      this.$router.push('/expenses/create');
     },
-    computed: {
-      paginatedExpenses() {
-        const start = (this.currentPage - 1) * this.perPage;
-        const end = this.currentPage * this.perPage;
-        return this.expenses.slice(start, end);
-      }
-    },
-    created() {
-      this.loadExpenses();
-    },
-    methods: {
-      goToUsers() {
-        this.$router.push('/users');
-      },
-      goToCreateExpense() {
-        this.$router.push('/expenses/create');
-      },
-      async loadExpenses() {
-        try {
-          const response = await this.$http.get('/expenses');
-          if (response.data && response.data.data) {
-            this.expenses = response.data.data;
-          } else {
-            this.errorMessage = 'Dados de despesas vazios ou não encontrados.';
-            this.expenses = [];
-          }
-        } catch (error) {
+    async loadExpenses() {
+      try {
+        const response = await this.$http.get('/expenses');
+        if (response.data && response.data.data) {
+          this.expenses = response.data.data;
+        } else {
+          this.errorMessage = 'Dados de despesas vazios ou não encontrados.';
           this.expenses = [];
         }
-      },
-      editExpense(expense) {
-        this.selectedExpense = expense;
-        this.showModal = true;
-      },
-      async handleUpdateExpense(updatedExpense) {
-        try {
-          const index = this.expenses.findIndex(expense => expense.id === updatedExpense.id);
-          if (index !== -1) {
+      } catch (error) {
+        this.expenses = [];
+      }
+    },
+    editExpense(expense) {
+      this.selectedExpense = expense;
+      this.showModal = true;
+    },
+    async handleUpdateExpense(updatedExpense) {
+      try {
+        const index = this.expenses.findIndex(expense => expense.id === updatedExpense.id);
+        if (index !== -1) {
             this.expenses.splice(index, 1, updatedExpense);
-          }
-          await this.loadExpenses();
-          this.closeModal();
-          this.alertMessage = 'Despesa atualizada com sucesso!';
+        }
+        await this.loadExpenses();
+        this.closeModal();
+        this.alertMessage = 'Despesa atualizada com sucesso!';
+        this.alertType = 'success';
+        this.setAutoCloseAlert();
+      } catch (error) {
+        this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
+        this.alertType = 'error';
+        this.setAutoCloseAlert();
+      }
+    },
+    async confirmDelete(expenseId) {
+      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
+        try {
+          await this.$http.delete(`/expenses/${expenseId}`);
+          this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
+          this.alertMessage = 'Despesa excluída com sucesso!';
           this.alertType = 'success';
           this.setAutoCloseAlert();
         } catch (error) {
-          this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
+          this.alertMessage = 'Erro ao excluir despesa. Por favor, tente novamente mais tarde.';
           this.alertType = 'error';
           this.setAutoCloseAlert();
         }
-      },
-      async confirmDelete(expenseId) {
-        if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-          try {
-            await this.$http.delete(`/expenses/${expenseId}`);
-            this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
-            this.alertMessage = 'Despesa excluída com sucesso!';
-            this.alertType = 'success';
-            this.setAutoCloseAlert();
-          } catch (error) {
-            this.alertMessage = 'Erro ao excluir despesa. Por favor, tente novamente mais tarde.';
-            this.alertType = 'error';
-            this.setAutoCloseAlert();
-          }
-        }
-      },
-      closeModal() {
-        this.showModal = false;
-        this.selectedExpense = null;
-      },
-      setAutoCloseAlert() {
-        setTimeout(() => {
-          this.alertMessage = '';
-        }, 3000);
       }
+    },
+    closeModal() {
+      this.showModal = false;
+      this.selectedExpense = null;
+    },
+    formatDate(date) {
+      return moment(date).format('DD/MM/YYYY');
+    },
+    setAutoCloseAlert() {
+      setTimeout(() => {
+        this.alertMessage = '';
+      }, 3000);
     }
-  };
+  }
+};
 </script>
 
 <style scoped>
@@ -186,4 +192,3 @@
     color: #721c24;
   }
 </style>
-
