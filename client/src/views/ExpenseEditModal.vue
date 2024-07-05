@@ -19,8 +19,8 @@
             </div>
             <div class="form-group mb-3">
               <label for="expense_date">Data da Despesa:</label>
-              <DatePicker v-model="selectedDate" type="date" format="DD/MM/YYYY" class="form-control" :disabled-date="disabledDates"></DatePicker>
-              <span v-if="errors && errors.selectedDate" class="error-message">{{ errors.selectedDate }}</span>
+              <DatePicker v-model="editedExpense.expense_date" type="date" format="DD/MM/YYYY" class="form-control" :disabled-date="disabledDates"></DatePicker>
+              <span v-if="errors && errors.expense_date" class="error-message">{{ errors.expense_date }}</span>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Salvar</button>
           </form>
@@ -51,7 +51,6 @@ export default {
         price: '',
         expense_date: null
       },
-      selectedDate: '',
       maxLength: 191,
       money: {
         decimal: ',',
@@ -70,12 +69,9 @@ export default {
     expense: {
       handler(newVal) {
         this.editedExpense = { ...newVal };
-        this.selectedDate = moment(newVal.expense_date).format('DD/MM/YYYY');
+        this.editedExpense.expense_date = newVal.expense_date ? moment(newVal.expense_date, 'YYYY-MM-DD').toDate() : null;
       },
       immediate: true
-    },
-    selectedDate(newVal) {
-      this.editedExpense.expense_date = moment(newVal, 'DD/MM/YYYY').format('DD/MM/YYYY');
     },
     alertMessage(newValue) {
       if (newValue) {
@@ -99,18 +95,16 @@ export default {
           return;
         }
 
-        console.log(this.editedExpense.expense_date);
-
         const response = await this.$http.put(`/expenses/${this.editedExpense.id}`, {
           ...this.editedExpense,
           price: price,
-          expense_date: this.editedExpense.expense_date
+          expense_date: this.editedExpense.expense_date ? moment(this.editedExpense.expense_date).format('DD/MM/YYYY') : null
         });
 
         this.errors = {};
 
         if (response.data.errors && response.data.errors.expense_date) {
-          this.errors.selectedDate = response.data.errors.expense_date[0];
+          this.errors.expense_date = response.data.errors.expense_date[0];
           return;
         }
 
@@ -121,11 +115,6 @@ export default {
       } catch (error) {
         if (error.response && error.response.status === 422 && error.response.data.errors) {
           this.errors = error.response.data.errors;
-
-          if (this.errors.expense_date) {
-            this.errors.selectedDate = 'A data da despesa é obrigatória.';
-          }
-
           return;
         }
 
@@ -145,13 +134,6 @@ export default {
     },
     disabledDates(date) {
       return date.getTime() > new Date().getTime();
-    },
-    validateForm() {
-      this.errors = {};
-
-      if (!this.form.expense_date) {
-        this.errors.expense_date = true;
-      }
     }
   },
   directives: {
