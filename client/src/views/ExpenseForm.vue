@@ -15,13 +15,14 @@
       <div class="form-group">
         <label for="expense_date">Data da Despesa:</label>
         <DatePicker v-model="form.expense_date" type="date" :disabled-date="disabledDates" class="form-control"></DatePicker>
+        <span v-if="errors && errors.expense_date" class="error-message">A data da despesa é obrigatória.</span>
       </div>
       <div class="form-group">
         <button type="submit" class="btn btn-primary btn-block">Cadastrar Despesa</button>
       </div>
     </form>
 
-    <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    <div v-if="errorMessage && errorMessage !== 'A data da despesa é obrigatória.'" class="alert alert-danger">{{ errorMessage }}</div>
     <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
   </div>
 </template>
@@ -56,7 +57,8 @@ export default {
         suffix: '',
         precision: 2,
         masked: true
-      }
+      },
+      errors: {}
     };
   },
   methods: {
@@ -72,6 +74,12 @@ export default {
       const price = parseFloat(this.form.price.replace(/[^\d,-]/g, '').replace(',', '.'));
       if (isNaN(price) || price < 0) {
         this.errorMessage = 'Por favor, insira um preço válido.';
+        return;
+      }
+
+      this.validateForm();
+
+      if (Object.keys(this.errors).length > 0) {
         return;
       }
 
@@ -103,6 +111,13 @@ export default {
     preventNegativeInput(event) {
       if (event.key === '-' || event.key === '+') {
         event.preventDefault();
+      }
+    },
+    validateForm() {
+      this.errors = {};
+
+      if (!this.form.expense_date) {
+        this.errors.expense_date = true;
       }
     }
   }
