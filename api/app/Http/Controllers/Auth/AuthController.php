@@ -188,14 +188,19 @@ class AuthController extends Controller
     */
     private function createUser(RegisterFormRequest $request): array
     {
+        $existingUser = User::where('email', $request->email)->first();
+        if ($existingUser) {
+            throw new \Exception('Email já cadastrado.', 422);
+        }
+    
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password)
         ]);
-
+    
         $token = $user->createToken('token')->accessToken;
-
+    
         return [
             'user' => $user,
             'token' => $token

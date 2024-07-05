@@ -84,7 +84,7 @@ class ExpensesControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'status' => 'success',
-                'message' => 'Expense deleted successfully.',
+                'message' => 'Despesa excluída com sucesso.',
             ])
         ;
     }
