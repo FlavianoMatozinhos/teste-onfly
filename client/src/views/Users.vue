@@ -8,7 +8,7 @@
       <input v-model="formData.password" type="password" placeholder="Senha" :required="!editingUser">
 
       <div class="buttons">
-        <button type="submit">{{ editingUser ? 'Atualizar' : 'Criar' }} Usuário</button>
+        <button type="submit" class="btn btn-success btn-sm mx-1">{{ editingUser ? 'Atualizar' : 'Criar' }} Usuário</button>
         <button v-if="editingUser" type="button" @click="resetForm">Voltar</button>
       </div>
     </form>
@@ -249,7 +249,7 @@
   }
 
   .buttons button:last-of-type {
-    background-color: #f44336;
+    background-color: #4caf50;
     color: white;
   }
 
