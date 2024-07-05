@@ -58,19 +58,17 @@ class AuthController extends Controller
     */
     public function register(RegisterFormRequest $request): JsonResponse
     {
-        $user = $this->createUser($request);
-
-        $token = $user->createToken('token')->accessToken;
-
-        $data['user'] = $user;
-
+        $userData = $this->createUser($request);
+    
         $response = [
             'status' => 'success',
-            'message' => 'User is created successfully.',
-            'data' => $data,
-            'token' => $token
+            'message' => 'O usuário foi criado com sucesso.',
+            'data' => [
+                'user' => $userData['user'],
+                'token' => $userData['token']
+            ]
         ];
-
+    
         return response()->json($response, 201);
     }
 
@@ -120,7 +118,7 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Invalid credentials'
+                'message' => 'Credenciais inválidas'
             ], 401);
         }
 
@@ -130,7 +128,7 @@ class AuthController extends Controller
 
         $response = [
             'status' => 'success',
-            'message' => 'User is logged in successfully.',
+            'message' => 'O usuário efetuou login com sucesso.',
             'data' => $data,
         ];
 
@@ -178,7 +176,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'User is logged out successfully'
+            'message' => 'O usuário foi desconectado com sucesso'
         ], 200);
     }
 
@@ -186,15 +184,22 @@ class AuthController extends Controller
      * Create a new user instance.
      *
      * @param RegisterFormRequest $request
-     * @return User
+     * @return array
     */
     private function createUser(RegisterFormRequest $request): array
     {
-        return User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password)
         ]);
+
+        $token = $user->createToken('token')->accessToken;
+
+        return [
+            'user' => $user,
+            'token' => $token
+        ];
     }
 
     /**

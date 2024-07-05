@@ -57,16 +57,16 @@ class ExpensesController extends Controller
             if ($expenses->isEmpty()) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'No expense found!',
+                    'message' => 'Nenhuma despesa encontrada!',
                 ], 404);
             }
 
             return ExpenseResource::collection($expenses);
         } catch (\Exception $e) {
-            Log::error('Error fetching expenses: ' . $e->getMessage());
+            Log::error('Erro ao buscar despesas: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to fetch expenses!',
+                'message' => 'Falha ao buscar despesas!',
             ], 500);
         }
     }
@@ -102,10 +102,10 @@ class ExpensesController extends Controller
 
             return new ExpenseResource($expense);
         } catch (\Exception $e) {
-            Log::error('Error creating expense: ' . $e->getMessage());
+            Log::error('Erro ao criar despesa: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to create expense!',
+                'message' => 'Falha ao criar despesa!',
             ], 500);
         }
     }
@@ -161,10 +161,10 @@ class ExpensesController extends Controller
 
             return new ExpenseResource($expense);
         } catch (\Exception $e) {
-            Log::error('Error fetching expense: ' . $e->getMessage());
+            Log::error('Erro ao buscar despesa: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to fetch expense!',
+                'message' => 'Falha ao buscar despesa!',
             ], 500);
         }
     }
@@ -221,10 +221,10 @@ class ExpensesController extends Controller
 
             return new ExpenseResource($expense);
         } catch (\Exception $e) {
-            Log::error('Error updating expense: ' . $e->getMessage());
+            Log::error('Erro ao atualizar despesa: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to update expense!',
+                'message' => 'Falha ao atualizar despesa!',
             ], 500);
         }
     }
@@ -285,13 +285,13 @@ class ExpensesController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Expense deleted successfully.',
+                'message' => 'Despesa excluída com sucesso.',
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting expense: ' . $e->getMessage());
+            Log::error('Erro ao excluir despesa: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to delete expense!',
+                'message' => 'Falha ao excluir despesa!',
             ], 500);
         }
     }

@@ -61,7 +61,12 @@ class UserController extends Controller
     */
     public function store(UserFormRequest $request): mixed
     {
-        $user = $this->createUser($request);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+        ]);
+    
         return new UserResource($user);
     }
 
@@ -125,7 +130,12 @@ class UserController extends Controller
     */
     public function update(Request $request, User $user): mixed
     {
-        $this->updateUser($request, $user);
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
+        ]);
+
         return new UserResource($user);
     }
 
@@ -155,36 +165,5 @@ class UserController extends Controller
     {
         $user->delete();
         return response()->json(null, 204);
-    }
-
-    /**
-     * Create a new user.
-     *
-     * @param UserFormRequest $request
-     * @return User
-    */
-    private function createUser(UserFormRequest $request)
-    {
-        return User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
-    }
-
-    /**
-     * Update a user.
-     *
-     * @param Request $request
-     * @param User $user
-     * @return void
-    */
-    private function updateUser(Request $request, User $user)
-    {
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
     }
 }
