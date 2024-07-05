@@ -29,7 +29,7 @@
           <td>{{ user.email }}</td>
           <td>
             <button class="btn btn-warning btn-sm mx-1" @click="editUser(user)">Editar</button>
-            <button class="btn btn-danger btn-sm mx-1" @click="confirmDeleteUser(user.id)">Excluir</button>
+            <button class="btn btn-danger btn-sm mx-1" @click="confirmDeleteUser(user.id, loggedInUserId)">Excluir</button>
           </td>
         </tr>
       </tbody>
@@ -55,7 +55,8 @@
         alertMessage: '',
         alertType: '',
         currentPage: 1,
-        itemsPerPage: 10
+        itemsPerPage: 10,
+        loggedInUserId: null
       };
     },
     computed: {
@@ -70,6 +71,7 @@
     },
     created() {
       this.loadUsers();
+      this.getLoggedInUserId();
     },
     methods: {
       async loadUsers() {
@@ -136,21 +138,33 @@
       async deleteUser(userId) {
         try {
           await axios.delete(`/users/${userId}`);
-          this.users = this.users.filter(user => user.id !== userId);
-          this.alertMessage = 'Usuário excluído com sucesso!';
-          this.alertType = 'success';
-          this.setAutoCloseAlert();
+          if (userId == this.loggedInUserId) {
+            this.alertMessage = 'Não é possivel deletar o usuario logado';
+            this.alertType = 'error';
+            this.setAutoCloseAlert();
+          } else {
+            this.users = this.users.filter(user => user.id !== userId);
+            this.alertMessage = 'Usuário excluído com sucesso!';
+            this.alertType = 'success';
+            this.setAutoCloseAlert();
+          }
         } catch (error) {
           this.alertMessage = 'Erro ao excluir usuário.';
           this.alertType = 'error';
           this.setAutoCloseAlert();
         }
       },
-      confirmDeleteUser(userId) {
-        if (confirm('Tem certeza que deseja excluir este usuário?')) {
-          this.deleteUser(userId);
-        }
-      },
+      confirmDeleteUser(userId, loggedInUserId) {
+          if (confirm('Tem certeza que deseja excluir este usuário?')) {
+            if (userId == loggedInUserId) {
+              this.alertMessage = 'Não é possivel deletar o usuario logado';
+              this.alertType = 'error';
+              this.setAutoCloseAlert();
+            } else {
+              this.deleteUser(userId);
+            }
+          }
+        },
       editUser(user) {
         this.editingUser = user;
         this.formData.name = user.name;
@@ -182,6 +196,12 @@
         setTimeout(() => {
           this.alertMessage = '';
         }, 3000);
+      },
+      async getLoggedInUserId() {
+        const token = localStorage.getItem('token');
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const userId = decodedToken.sub;
+        this.loggedInUserId = userId;
       }
     }
   };
@@ -224,30 +244,40 @@
   }
 
   .buttons button:first-of-type {
-    background-color: #007bff;
+    background-color: #4caf50;
     color: white;
   }
 
   .buttons button:last-of-type {
-    background-color: #007bff;
+    background-color: #f44336;
     color: white;
   }
 
   table {
-    width: 80%;
-    margin: auto;
+    width: 100%;
+    max-width: 800px;
+    margin: 1rem auto;
     border-collapse: collapse;
-    margin-top: 20px;
   }
 
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+  table th, table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
   }
 
-  th {
-    background-color: #f2f2f2;
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .pagination button {
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
   }
 
   .alert {
@@ -256,39 +286,13 @@
     border-radius: 5px;
   }
 
-  .alert-success {
-    background-color: #d4edda;
-    color: #155724;
-  }
-
   .alert-danger {
     background-color: #f8d7da;
     color: #721c24;
   }
 
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-  }
-
-  .pagination button {
-    margin: 0 10px;
-    padding: 5px 10px;
-    cursor: pointer;
-    border: 1px solid #007bff;
-    background-color: white;
-    color: #007bff;
-    border-radius: 5px;
-  }
-
-  .pagination button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-
-  .pagination span {
-    margin: 0 10px;
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
   }
 </style>
