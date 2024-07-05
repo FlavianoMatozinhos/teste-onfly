@@ -163,10 +163,10 @@ export default {
     handleFormError(error) {
       if (error.response && error.response.status === 422 && error.response.data.errors) {
         if (error.response.data.errors.password) {
-          this.alertMessage = 'Erro ao processar usuário: ' + error.response.data.errors.password[0];
+          this.alertMessage = 'Erro ao processar usuário: O campo de senha deve ter pelo menos 8 caracteres.';
           this.setAutoCloseAlert();
         } else if (error.response.data.errors.email) {
-          this.alertMessage = 'Erro ao processar usuário: ' + error.response.data.errors.email[0];
+          this.alertMessage = 'Erro ao processar usuário: Já existe um usuário com este email.';
           this.setAutoCloseAlert();
         } else {
           this.alertMessage = 'Erro ao processar usuário.';
