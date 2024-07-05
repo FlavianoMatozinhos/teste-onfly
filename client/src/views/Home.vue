@@ -5,6 +5,9 @@
       <button class="btn btn-primary mx-2" @click="goToUsers">Gerenciar Usuários</button>
       <button class="btn btn-success mx-2" @click="goToCreateExpense">Cadastrar Despesa</button>
     </div>
+    <div v-if="alertMessage" :class="['alert', alertType === 'error' ? 'alert-danger' : 'alert-success']">
+      <p>{{ alertMessage }}</p>
+    </div>
     <div v-if="expenses.length">
       <h3 class="text-center mb-4 mt-4">Suas Despesas</h3>
       <table class="table table-striped table-hover">
@@ -16,7 +19,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="expense in expenses" :key="expense.id">
+          <tr v-for="expense in paginatedExpenses" :key="expense.id">
             <td>{{ expense.descriptions }}</td>
             <td>{{ expense.price }}</td>
             <td>
@@ -26,12 +29,10 @@
           </tr>
         </tbody>
       </table>
+      <pagination :records="expenses.length" :per-page="perPage" v-model="currentPage"></pagination>
     </div>
     <div v-else>
       <p class="text-center">Você não possui despesas cadastradas.</p>
-    </div>
-    <div v-if="alertMessage" :class="['alert', alertType === 'error' ? 'alert-danger' : 'alert-success']">
-      <p>{{ alertMessage }}</p>
     </div>
 
     <expense-edit-modal
@@ -45,10 +46,12 @@
 
 <script>
 import ExpenseEditModal from './ExpenseEditModal.vue';
+import Pagination from 'vue-pagination-2';
 
 export default {
   components: {
-    ExpenseEditModal
+    ExpenseEditModal,
+    Pagination
   },
   data() {
     return {
@@ -58,8 +61,17 @@ export default {
       showModal: false,
       selectedExpense: null,
       alertMessage: '',
-      alertType: ''
+      alertType: '',
+      currentPage: 1,
+      perPage: 10
     };
+  },
+  computed: {
+    paginatedExpenses() {
+      const start = (this.currentPage - 1) * this.perPage;
+      const end = this.currentPage * this.perPage;
+      return this.expenses.slice(start, end);
+    }
   },
   created() {
     this.loadExpenses();
@@ -143,10 +155,19 @@ export default {
 
 table {
   width: 100%;
+  table-layout: fixed;
 }
 
 th, td {
   text-align: center;
+  word-wrap: break-word;
+}
+
+td {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .alert {
@@ -165,3 +186,4 @@ th, td {
   color: #721c24;
 }
 </style>
+

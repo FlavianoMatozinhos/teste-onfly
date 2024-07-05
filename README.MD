@@ -46,6 +46,10 @@ Certifique-se de ter as seguintes ferramentas instaladas em seu sistema:
         - npm install axios (No arquivo FrontEnd - client)
     ```
 
+    ```
+        npm install vue-pagination-2 (No arquivo FrontEnd - client)
+    ```
+
 
 4. **Geração da Chave de Aplicação**
     ```

@@ -12,7 +12,9 @@
         <button v-if="editingUser" type="button" @click="resetForm">Voltar</button>
       </div>
     </form>
-
+    <div v-if="alertMessage" :class="['alert', alertType === 'error' ? 'alert-danger' : 'alert-success']">
+      {{ alertMessage }}
+    </div>
     <table v-if="!editingUser" class="compact-table">
       <thead>
         <tr>
@@ -22,19 +24,21 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id">
+        <tr v-for="user in paginatedUsers" :key="user.id">
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>
-            <button @click="editUser(user)">Editar</button>
-            <button @click="confirmDeleteUser(user.id)">Excluir</button>
+            <button class="btn btn-warning btn-sm mx-1" @click="editUser(user)">Editar</button>
+            <button class="btn btn-danger btn-sm mx-1" @click="confirmDeleteUser(user.id)">Excluir</button>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <div v-if="alertMessage" :class="['alert', alertType === 'error' ? 'alert-danger' : 'alert-success']">
-      {{ alertMessage }}
+    <div v-if="!editingUser" class="pagination mb-4">
+      <button :disabled="currentPage === 1" @click="currentPage--">Anterior</button>
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <button :disabled="currentPage === totalPages" @click="currentPage++">Próxima</button>
     </div>
   </div>
 </template>
@@ -49,8 +53,20 @@ export default {
       formData: { name: '', email: '', password: '' },
       editingUser: null,
       alertMessage: '',
-      alertType: ''
+      alertType: '',
+      currentPage: 1,
+      itemsPerPage: 10
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.users.length / this.itemsPerPage);
+    },
+    paginatedUsers() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.users.slice(start, end);
+    }
   },
   created() {
     this.loadUsers();
@@ -63,20 +79,45 @@ export default {
       } catch (error) {
         this.alertMessage = 'Erro ao carregar usuários.';
         this.alertType = 'error';
+        this.setAutoCloseAlert();
       }
     },
     async createUser() {
+      if (!this.formData.password) {
+        this.alertMessage = 'Campo de senha não pode ser vazio.';
+        this.alertType = 'error';
+        this.setAutoCloseAlert();
+        return;
+      }
+
       try {
         const response = await axios.post('/users', this.formData);
         this.users.push(response.data.data);
         this.resetForm();
         this.alertMessage = 'Usuário criado com sucesso!';
         this.alertType = 'success';
+        this.setAutoCloseAlert();
       } catch (error) {
         this.handleFormError(error);
       }
     },
     async updateUser() {
+      if (!this.formData.password) {
+        this.alertMessage = 'Campo de senha não pode ser vazio.';
+        this.alertType = 'error';
+        this.setAutoCloseAlert();
+        return;
+      }
+      if (this.formData.email !== this.editingUser.email) {
+        const emailExists = this.users.some(user => user.email === this.formData.email);
+        if (emailExists) {
+          this.alertMessage = 'Já existe um usuário com este email.';
+          this.alertType = 'error';
+          this.setAutoCloseAlert();
+          return;
+        }
+      }
+
       try {
         const response = await axios.put(`/users/${this.editingUser.id}`, this.formData);
         const updatedUser = response.data;
@@ -98,9 +139,11 @@ export default {
         this.users = this.users.filter(user => user.id !== userId);
         this.alertMessage = 'Usuário excluído com sucesso!';
         this.alertType = 'success';
+        this.setAutoCloseAlert();
       } catch (error) {
         this.alertMessage = 'Erro ao excluir usuário.';
         this.alertType = 'error';
+        this.setAutoCloseAlert();
       }
     },
     confirmDeleteUser(userId) {
@@ -121,15 +164,24 @@ export default {
       if (error.response && error.response.status === 422 && error.response.data.errors) {
         if (error.response.data.errors.password) {
           this.alertMessage = 'Erro ao processar usuário: ' + error.response.data.errors.password[0];
+          this.setAutoCloseAlert();
         } else if (error.response.data.errors.email) {
           this.alertMessage = 'Erro ao processar usuário: ' + error.response.data.errors.email[0];
+          this.setAutoCloseAlert();
         } else {
           this.alertMessage = 'Erro ao processar usuário.';
+          this.setAutoCloseAlert();
         }
       } else {
         this.alertMessage = 'Erro ao processar usuário.';
+        this.setAutoCloseAlert();
       }
       this.alertType = 'error';
+    },
+    setAutoCloseAlert() {
+      setTimeout(() => {
+        this.alertMessage = '';
+      }, 3000);
     }
   }
 };
@@ -177,7 +229,7 @@ input {
 }
 
 .buttons button:last-of-type {
-  background-color: #6c757d;
+  background-color: #007bff;
   color: white;
 }
 
@@ -212,5 +264,31 @@ th {
 .alert-danger {
   background-color: #f8d7da;
   color: #721c24;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin: 0 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: 1px solid #007bff;
+  background-color: white;
+  color: #007bff;
+  border-radius: 5px;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination span {
+  margin: 0 10px;
 }
 </style>

@@ -4,7 +4,7 @@
     <form @submit.prevent="submitExpense">
       <div class="form-group">
         <label for="descriptions">Descrição:</label>
-        <input type="text" id="descriptions" v-model="form.descriptions" maxlength="191" required>
+        <input type="text" id="descriptions" v-model="form.descriptions" :maxlength="maxLength" required>
         <span v-if="form.descriptions.length > 191" class="error-message">A descrição não pode ter mais de 191 caracteres.</span>
       </div>
       <div class="form-group">
@@ -46,6 +46,7 @@ export default {
         price: '',
         expense_date: ''
       },
+      maxLength: 191,
       errorMessage: '',
       successMessage: '',
       money: {
