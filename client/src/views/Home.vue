@@ -45,145 +45,145 @@
 </template>
 
 <script>
-import ExpenseEditModal from './ExpenseEditModal.vue';
-import Pagination from 'vue-pagination-2';
+  import ExpenseEditModal from './ExpenseEditModal.vue';
+  import Pagination from 'vue-pagination-2';
 
-export default {
-  components: {
-    ExpenseEditModal,
-    Pagination
-  },
-  data() {
-    return {
-      expenses: [],
-      error: false,
-      errorMessage: '',
-      showModal: false,
-      selectedExpense: null,
-      alertMessage: '',
-      alertType: '',
-      currentPage: 1,
-      perPage: 10
-    };
-  },
-  computed: {
-    paginatedExpenses() {
-      const start = (this.currentPage - 1) * this.perPage;
-      const end = this.currentPage * this.perPage;
-      return this.expenses.slice(start, end);
-    }
-  },
-  created() {
-    this.loadExpenses();
-  },
-  methods: {
-    goToUsers() {
-      this.$router.push('/users');
+  export default {
+    components: {
+      ExpenseEditModal,
+      Pagination
     },
-    goToCreateExpense() {
-      this.$router.push('/expenses/create');
+    data() {
+      return {
+        expenses: [],
+        error: false,
+        errorMessage: '',
+        showModal: false,
+        selectedExpense: null,
+        alertMessage: '',
+        alertType: '',
+        currentPage: 1,
+        perPage: 10
+      };
     },
-    async loadExpenses() {
-      try {
-        const response = await this.$http.get('/expenses');
-        if (response.data && response.data.data) {
-          this.expenses = response.data.data;
-        } else {
-          this.errorMessage = 'Dados de despesas vazios ou não encontrados.';
+    computed: {
+      paginatedExpenses() {
+        const start = (this.currentPage - 1) * this.perPage;
+        const end = this.currentPage * this.perPage;
+        return this.expenses.slice(start, end);
+      }
+    },
+    created() {
+      this.loadExpenses();
+    },
+    methods: {
+      goToUsers() {
+        this.$router.push('/users');
+      },
+      goToCreateExpense() {
+        this.$router.push('/expenses/create');
+      },
+      async loadExpenses() {
+        try {
+          const response = await this.$http.get('/expenses');
+          if (response.data && response.data.data) {
+            this.expenses = response.data.data;
+          } else {
+            this.errorMessage = 'Dados de despesas vazios ou não encontrados.';
+            this.expenses = [];
+          }
+        } catch (error) {
           this.expenses = [];
         }
-      } catch (error) {
-        this.expenses = [];
-      }
-    },
-    editExpense(expense) {
-      this.selectedExpense = expense;
-      this.showModal = true;
-    },
-    async handleUpdateExpense(updatedExpense) {
-      try {
-        const index = this.expenses.findIndex(expense => expense.id === updatedExpense.id);
-        if (index !== -1) {
-          this.expenses.splice(index, 1, updatedExpense);
-        }
-        await this.loadExpenses();
-        this.closeModal();
-        this.alertMessage = 'Despesa atualizada com sucesso!';
-        this.alertType = 'success';
-        this.setAutoCloseAlert();
-      } catch (error) {
-        this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
-        this.alertType = 'error';
-        this.setAutoCloseAlert();
-      }
-    },
-    async confirmDelete(expenseId) {
-      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
+      },
+      editExpense(expense) {
+        this.selectedExpense = expense;
+        this.showModal = true;
+      },
+      async handleUpdateExpense(updatedExpense) {
         try {
-          await this.$http.delete(`/expenses/${expenseId}`);
-          this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
-          this.alertMessage = 'Despesa excluída com sucesso!';
+          const index = this.expenses.findIndex(expense => expense.id === updatedExpense.id);
+          if (index !== -1) {
+            this.expenses.splice(index, 1, updatedExpense);
+          }
+          await this.loadExpenses();
+          this.closeModal();
+          this.alertMessage = 'Despesa atualizada com sucesso!';
           this.alertType = 'success';
           this.setAutoCloseAlert();
         } catch (error) {
-          this.alertMessage = 'Erro ao excluir despesa. Por favor, tente novamente mais tarde.';
+          this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
           this.alertType = 'error';
           this.setAutoCloseAlert();
         }
+      },
+      async confirmDelete(expenseId) {
+        if (confirm('Tem certeza que deseja excluir esta despesa?')) {
+          try {
+            await this.$http.delete(`/expenses/${expenseId}`);
+            this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
+            this.alertMessage = 'Despesa excluída com sucesso!';
+            this.alertType = 'success';
+            this.setAutoCloseAlert();
+          } catch (error) {
+            this.alertMessage = 'Erro ao excluir despesa. Por favor, tente novamente mais tarde.';
+            this.alertType = 'error';
+            this.setAutoCloseAlert();
+          }
+        }
+      },
+      closeModal() {
+        this.showModal = false;
+        this.selectedExpense = null;
+      },
+      setAutoCloseAlert() {
+        setTimeout(() => {
+          this.alertMessage = '';
+        }, 3000);
       }
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedExpense = null;
-    },
-    setAutoCloseAlert() {
-      setTimeout(() => {
-        this.alertMessage = '';
-      }, 3000);
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.home {
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
+  .home {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
 
-table {
-  width: 100%;
-  table-layout: fixed;
-}
+  table {
+    width: 100%;
+    table-layout: fixed;
+  }
 
-th, td {
-  text-align: center;
-  word-wrap: break-word;
-}
+  th, td {
+    text-align: center;
+    word-wrap: break-word;
+  }
 
-td {
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  td {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
-.alert {
-  margin-top: 20px;
-}
+  .alert {
+    margin-top: 20px;
+  }
 
-.alert-success {
-  background-color: #d4edda;
-  border-color: #c3e6cb;
-  color: #155724;
-}
+  .alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
 
-.alert-danger {
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-  color: #721c24;
-}
+  .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
 </style>
 

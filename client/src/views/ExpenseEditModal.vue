@@ -34,190 +34,190 @@
 </template>
 
 <script>
-import DatePicker from 'vue2-datepicker';
-import moment from 'moment';
-import { VMoney } from 'v-money';
+  import DatePicker from 'vue2-datepicker';
+  import moment from 'moment';
+  import { VMoney } from 'v-money';
 
-export default {
-  props: {
-    showModal: Boolean,
-    expense: Object
-  },
-  data() {
-    return {
-      editedExpense: {
-        id: null,
-        descriptions: '',
-        price: '',
-        expense_date: null
-      },
-      maxLength: 191,
-      money: {
-        decimal: ',',
-        thousands: '.',
-        prefix: 'R$ ',
-        suffix: '',
-        precision: 2,
-        masked: true
-      },
-      errors: {},
-      alertMessage: '',
-      alertType: ''
-    };
-  },
-  watch: {
-    expense: {
-      handler(newVal) {
-        this.editedExpense = { ...newVal };
-        this.editedExpense.expense_date = newVal.expense_date ? moment(newVal.expense_date, 'YYYY-MM-DD').toDate() : null;
-      },
-      immediate: true
+  export default {
+    props: {
+      showModal: Boolean,
+      expense: Object
     },
-    alertMessage(newValue) {
-      if (newValue) {
-        setTimeout(() => {
-          this.alertMessage = '';
-        }, 3000);
+    data() {
+      return {
+        editedExpense: {
+          id: null,
+          descriptions: '',
+          price: '',
+          expense_date: null
+        },
+        maxLength: 191,
+        money: {
+          decimal: ',',
+          thousands: '.',
+          prefix: 'R$ ',
+          suffix: '',
+          precision: 2,
+          masked: true
+        },
+        errors: {},
+        alertMessage: '',
+        alertType: ''
+      };
+    },
+    watch: {
+      expense: {
+        handler(newVal) {
+          this.editedExpense = { ...newVal };
+          this.editedExpense.expense_date = newVal.expense_date ? moment(newVal.expense_date, 'YYYY-MM-DD').toDate() : null;
+        },
+        immediate: true
+      },
+      alertMessage(newValue) {
+        if (newValue) {
+          setTimeout(() => {
+            this.alertMessage = '';
+          }, 3000);
+        }
       }
-    }
-  },
-  methods: {
-    closeModal() {
-      this.$emit('close');
-      this.editedExpense = {};
     },
-    async saveExpense() {
-      try {
-        const price = parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.'));
-        if (isNaN(price) || price < 0) {
-          this.alertMessage = 'Por favor, insira um preço válido.';
+    methods: {
+      closeModal() {
+        this.$emit('close');
+        this.editedExpense = {};
+      },
+      async saveExpense() {
+        try {
+          const price = parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.'));
+          if (isNaN(price) || price < 0) {
+            this.alertMessage = 'Por favor, insira um preço válido.';
+            this.alertType = 'error';
+            return;
+          }
+
+          const response = await this.$http.put(`/expenses/${this.editedExpense.id}`, {
+            ...this.editedExpense,
+            price: price,
+            expense_date: this.editedExpense.expense_date ? moment(this.editedExpense.expense_date).format('DD/MM/YYYY') : null
+          });
+
+          this.errors = {};
+
+          if (response.data.errors && response.data.errors.expense_date) {
+            this.errors.expense_date = response.data.errors.expense_date[0];
+            return;
+          }
+
+          this.$emit('update', response.data);
+          this.closeModal();
+          this.alertMessage = 'Despesa atualizada com sucesso.';
+          this.alertType = 'success';
+        } catch (error) {
+          if (error.response && error.response.status === 422 && error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            return;
+          }
+
+          this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
           this.alertType = 'error';
-          return;
         }
-
-        const response = await this.$http.put(`/expenses/${this.editedExpense.id}`, {
-          ...this.editedExpense,
-          price: price,
-          expense_date: this.editedExpense.expense_date ? moment(this.editedExpense.expense_date).format('DD/MM/YYYY') : null
-        });
-
-        this.errors = {};
-
-        if (response.data.errors && response.data.errors.expense_date) {
-          this.errors.expense_date = response.data.errors.expense_date[0];
-          return;
+      },
+      clearPriceErrors() {
+        if (parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0) {
+          this.editedExpense.price = '';
         }
-
-        this.$emit('update', response.data);
-        this.closeModal();
-        this.alertMessage = 'Despesa atualizada com sucesso.';
-        this.alertType = 'success';
-      } catch (error) {
-        if (error.response && error.response.status === 422 && error.response.data.errors) {
-          this.errors = error.response.data.errors;
-          return;
+      },
+      preventNegativeInput(event) {
+        if (event.key === '-' || event.key === '+') {
+          event.preventDefault();
         }
-
-        this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
-        this.alertType = 'error';
+      },
+      disabledDates(date) {
+        return date.getTime() > new Date().getTime();
       }
     },
-    clearPriceErrors() {
-      if (parseFloat(this.editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0) {
-        this.editedExpense.price = '';
-      }
+    directives: {
+      money: VMoney
     },
-    preventNegativeInput(event) {
-      if (event.key === '-' || event.key === '+') {
-        event.preventDefault();
-      }
-    },
-    disabledDates(date) {
-      return date.getTime() > new Date().getTime();
+    components: {
+      DatePicker
     }
-  },
-  directives: {
-    money: VMoney
-  },
-  components: {
-    DatePicker
-  }
-};
+  };
 </script>
 
 <style scoped>
-.modal {
-  display: block;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
-}
+  .modal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
 
-.modal-dialog {
-  max-width: 400px;
-  margin: 0vh auto;
-}
+  .modal-dialog {
+    max-width: 400px;
+    margin: 0vh auto;
+  }
 
-.modal-content {
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-}
+  .modal-content {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.close {
-  color: #aaaaaa;
-  font-size: 28px;
-  font-weight: bold;
-  background: none;
-  border: none;
-}
+  .close {
+    color: #aaaaaa;
+    font-size: 28px;
+    font-weight: bold;
+    background: none;
+    border: none;
+  }
 
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
 
-label {
-  display: flex !important;
-}
+  label {
+    display: flex !important;
+  }
 
-.mx-datepicker {
-  width: 100% !important;
-}
+  .mx-datepicker {
+    width: 100% !important;
+  }
 
-.error-message {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
 
-.alert {
-  margin-top: 10px;
-  transition: opacity 0.5s ease;
-}
+  .alert {
+    margin-top: 10px;
+    transition: opacity 0.5s ease;
+  }
 
-.alert-success {
-  background-color: #d4edda;
-  border-color: #c3e6cb;
-  color: #155724;
-}
+  .alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
 
-.alert-danger {
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-  color: #721c24;
-}
+  .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
 </style>

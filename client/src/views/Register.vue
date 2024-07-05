@@ -25,70 +25,70 @@
 </template>
 
 <script>
-import axios from 'axios';
+  import axios from 'axios';
 
-export default {
-  name: "Register",
-  data() {
-    return {
-      form: {
-        name: '',
-        email: '',
-        password: ''
-      },
-      alertMessage: '',
-      alertType: ''
-    };
-  },
-  methods: {
-    async register() {
-      if (this.form.password.length < 8) {
-        this.alertMessage = 'A senha deve ter pelo menos 8 caracteres.';
-        this.alertType = 'alert-danger';
-        return;
-      }
-      try {
-        await axios.post('http://localhost:8000/api/register', this.form);
-        this.alertMessage = 'Registrado com sucesso!';
-        this.alertType = 'alert-success';
-        setTimeout(() => {
-          this.$router.push({ name: 'Login' });
-        }, 2000);
-      } catch (error) {
-        if (error.response.status === 422 && error.response.data.message === 'The email has already been taken.') {
-          this.alertMessage = 'Email já cadastrado.';
-        } else {
-          this.alertMessage = 'Erro ao registrar. Tente novamente mais tarde.';
+  export default {
+    name: "Register",
+    data() {
+      return {
+        form: {
+          name: '',
+          email: '',
+          password: ''
+        },
+        alertMessage: '',
+        alertType: ''
+      };
+    },
+    methods: {
+      async register() {
+        if (this.form.password.length < 8) {
+          this.alertMessage = 'A senha deve ter pelo menos 8 caracteres.';
+          this.alertType = 'alert-danger';
+          return;
         }
-        this.alertType = 'alert-danger';
+        try {
+          await axios.post('http://localhost:8000/api/register', this.form);
+          this.alertMessage = 'Registrado com sucesso!';
+          this.alertType = 'alert-success';
+          setTimeout(() => {
+            this.$router.push({ name: 'Login' });
+          }, 2000);
+        } catch (error) {
+          if (error.response.status === 422 && error.response.data.message === 'The email has already been taken.') {
+            this.alertMessage = 'Email já cadastrado.';
+          } else {
+            this.alertMessage = 'Erro ao registrar. Tente novamente mais tarde.';
+          }
+          this.alertType = 'alert-danger';
+        }
       }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.register-container {
-  background-color: #f8f9fa;
-}
+  .register-container {
+    background-color: #f8f9fa;
+  }
 
-.register-box {
-  background-color: #ffffff;
-  border-radius: 10px;
-}
+  .register-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+  }
 
-.alert {
-  padding: 10px;
-  margin-bottom: 15px;
-}
+  .alert {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
 
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-}
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
 
-.alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-}
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
 </style>

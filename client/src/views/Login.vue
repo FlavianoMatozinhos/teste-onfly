@@ -21,57 +21,57 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      formData: {
-        email: '',
-        password: ''
-      },
-      alertMessage: '',
-      alertType: ''
-    };
-  },
-  methods: {
-    async login() {
-      try {
-        await this.$store.dispatch('login', this.formData);
-        this.alertMessage = 'Login realizado com sucesso!';
-        this.alertType = 'alert-success';
-        setTimeout(() => {
-          this.$router.push('/');
-        }, 2000);
-      } catch (error) {
-        this.alertMessage = 'Email ou Senha inválida.';
-        this.alertType = 'alert-danger';
+  export default {
+    data() {
+      return {
+        formData: {
+          email: '',
+          password: ''
+        },
+        alertMessage: '',
+        alertType: ''
+      };
+    },
+    methods: {
+      async login() {
+        try {
+          await this.$store.dispatch('login', this.formData);
+          this.alertMessage = 'Login realizado com sucesso!';
+          this.alertType = 'alert-success';
+          setTimeout(() => {
+            this.$router.push('/');
+          }, 2000);
+        } catch (error) {
+          this.alertMessage = 'Email ou Senha inválida.';
+          this.alertType = 'alert-danger';
+        }
       }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.login-container {
-  background-color: #f8f9fa;
-}
+  .login-container {
+    background-color: #f8f9fa;
+  }
 
-.login-box {
-  background-color: #ffffff;
-  border-radius: 10px;
-}
+  .login-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+  }
 
-.alert {
-  padding: 10px;
-  margin-bottom: 15px;
-}
+  .alert {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
 
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-}
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
 
-.alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
-}
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
 </style>
