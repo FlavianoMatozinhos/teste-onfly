@@ -14,7 +14,7 @@
       </div>
       <div class="form-group">
         <label for="expense_date">Data da Despesa:</label>
-        <DatePicker v-model="form.expense_date" type="date" :disabled-date="disabledDates" class="form-control"></DatePicker>
+        <DatePicker v-model="form.expense_date" type="date" format="DD/MM/YYYY" :disabled-date="disabledDates" class="form-control"></DatePicker>
         <span v-if="errors && errors.expense_date" class="error-message">A data da despesa é obrigatória.</span>
       </div>
       <div class="form-group">

@@ -10,16 +10,17 @@
           <form @submit.prevent="saveExpense">
             <div class="form-group mb-3">
               <label for="descriptions">Descrição:</label>
-              <input type="text" id="descriptions" class="form-control" v-model="editedExpense.descriptions" required>
+              <input type="text" id="descriptions" class="form-control" v-model="editedExpense.descriptions" :maxlength="maxLength" required>
             </div>
             <div class="form-group  mb-3">
               <label for="price">Preço:</label>
-              <input type="text" id="price" class="form-control" v-model="editedExpense.price" v-money="money" @input="clearPriceErrors" required>
+              <input type="text" id="price" class="form-control" v-model="editedExpense.price" v-money="money" @input="clearPriceErrors" @keypress="preventNegativeInput" required>
               <span v-if="parseFloat(editedExpense.price.replace(/[^\d,-]/g, '').replace(',', '.')) < 0" class="error-message">O preço não pode ser negativo.</span>
             </div>
             <div class="form-group mb-3">
               <label for="expense_date">Data da Despesa:</label>
               <DatePicker v-model="selectedDate" type="date" format="DD/MM/YYYY" class="form-control" :disabled-date="disabledDates"></DatePicker>
+              <span v-if="errors && errors.selectedDate" class="error-message">{{ errors.selectedDate }}</span>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Salvar</button>
           </form>
@@ -51,6 +52,7 @@ export default {
         expense_date: null
       },
       selectedDate: '',
+      maxLength: 191,
       money: {
         decimal: ',',
         thousands: '.',
@@ -59,6 +61,7 @@ export default {
         precision: 2,
         masked: true
       },
+      errors: {},
       alertMessage: '',
       alertType: ''
     };
@@ -96,17 +99,36 @@ export default {
           return;
         }
 
+        console.log(this.editedExpense.expense_date);
+
         const response = await this.$http.put(`/expenses/${this.editedExpense.id}`, {
           ...this.editedExpense,
           price: price,
           expense_date: this.editedExpense.expense_date
         });
 
+        this.errors = {};
+
+        if (response.data.errors && response.data.errors.expense_date) {
+          this.errors.selectedDate = response.data.errors.expense_date[0];
+          return;
+        }
+
         this.$emit('update', response.data);
         this.closeModal();
         this.alertMessage = 'Despesa atualizada com sucesso.';
         this.alertType = 'success';
       } catch (error) {
+        if (error.response && error.response.status === 422 && error.response.data.errors) {
+          this.errors = error.response.data.errors;
+
+          if (this.errors.expense_date) {
+            this.errors.selectedDate = 'A data da despesa é obrigatória.';
+          }
+
+          return;
+        }
+
         this.alertMessage = 'Erro ao atualizar despesa. Por favor, tente novamente mais tarde.';
         this.alertType = 'error';
       }
@@ -116,8 +138,20 @@ export default {
         this.editedExpense.price = '';
       }
     },
+    preventNegativeInput(event) {
+      if (event.key === '-' || event.key === '+') {
+        event.preventDefault();
+      }
+    },
     disabledDates(date) {
       return date.getTime() > new Date().getTime();
+    },
+    validateForm() {
+      this.errors = {};
+
+      if (!this.form.expense_date) {
+        this.errors.expense_date = true;
+      }
     }
   },
   directives: {
